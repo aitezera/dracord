@@ -1,70 +1,67 @@
-#include <cpr/cpr.h>
-#include <iostream>
-using std::string;
+#include "requests.h"
+#include "logging.h"
 
-class Requests {
-    public:
-        string base_api = "https://discord.com/api/v9/";
 
-        Requests(string uToken) {
-            token = uToken;  // Set token
-        }
+int Requests::login_user() {
+    /*
+    - Called upon first initialisation of the client
+    - Sends a GET request to the Discord API to check if the token is valid
+    - Return information for the user and store their token for later use
+    */
 
-        int login_user() {
-            if (token.empty()) {
-                handle_status_code(401);
-                return 1;
-            }
+    Log* log = Log::getInstance();
 
-            cpr::Header headers = {
-                {"Content-Type", "application/json"},
-                {"Authorization", token}
-            };
+    if (token.empty()) {
+        handle_status_code(401);
+        return 1;
+    }
 
-            cpr::Response response = cpr::Get(cpr::Url{base_api + "users/@me"}, headers=headers);
-            
-            std::cout << "Using GET response with URL: " << response.url << std::endl;
+    cpr::Header headers = {
+        {"Content-Type", "application/json"},
+        {"Authorization", token}
+    };
 
-            if (response.status_code != 200) {
-                handle_status_code(response.status_code);
-                return 1;
-            }
+    cpr::Response response = cpr::Get(cpr::Url{base_api + "users/@me"}, headers=headers);
+    log->Info(("Using GET response with URL: " + base_api + "users/@me").c_str());
 
-            std::cout << response.text << std::endl;
-            return 0;
-        }
+    if (response.status_code != 200) {
+        handle_status_code(response.status_code);
+        return 1;
+    }
 
-    private:
-        string token;
+    log->Info(("Response: " + std::string(response.text)).c_str());
+    return 0;
+}
 
-        void load_friends() {}
-        void load_guilds() {}
-        void load_channels() {}
-        void load_messages() {}
+void Requests::load_friends() {}
+void Requests::load_guilds() {}
+void Requests::load_channels() {}
+void Requests::load_messages() {}
 
-        void handle_status_code(int status_code) {
-            switch (status_code) {
-                case 400:
-                    std::cerr << "Bad Request!" << std::endl;
-                    break;
-                case 401:
-                    std::cerr << "Unauthorized! Check your token." << std::endl;
-                    break;
-                case 403:
-                    std::cerr << "Forbidden! You don't have permission." << std::endl;
-                    break;
-                case 404:
-                    std::cerr << "Not Found! The endpoint is incorrect." << std::endl;
-                    break;
-                case 429:
-                    std::cerr << "Too Many Requests! You are being rate-limited." << std::endl;
-                    break;
-                default:
-                    std::cerr << "Error! Status code: " << status_code << std::endl;
-                    break;
-            }
-        }
-};
+void Requests::handle_status_code(int status_code) {
+    Log* log = Log::getInstance();
+
+    switch (status_code) {
+        case 400:
+            log->Error("Bad Request!");
+            break;
+        case 401:
+            log->Error("Unauthorized! Check your token.");
+            break;
+        case 403:
+            log->Error("Forbidden! You don't have permission.");
+            break;
+        case 404:
+            log->Error("Not Found! The endpoint is incorrect.");
+            break;
+        case 429:
+            log->Error("Too Many Requests! You are being rate-limited.");
+            break;
+        default:
+            log->Error(("Error! Status code: " + std::to_string(status_code)).c_str());
+            break;
+    }
+}
 
 int main() {
     // This is here for testing purposes only

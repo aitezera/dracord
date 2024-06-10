@@ -19,4 +19,4 @@ all:
 # This is here to only test SDL2 rather than requesting to the Discord API
 # This will be removed upon actually having them linked together.
 debug:
-	$(ECC) -o $(NAME) src/main.cpp src/sdlinput.cpp src/sdlinput.h $(FLAGS)
+	$(ECC) -o $(NAME) src/main.cpp src/sdlinput.cpp src/logging.cpp $(FLAGS)

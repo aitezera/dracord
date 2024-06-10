@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#
 
 class Log {
     public:
@@ -10,15 +11,21 @@ class Log {
             LevelWarning = 1,
             LevelInfo = 2,
         };
+        
 
     private:
         // Default logging level
         Level m_LogLevel = LevelInfo;
+        static Log* instance;
 
         // Set to NULL by default for printing to console
         FILE* m_File = NULL;
+
+        Log() {}
     
     public:
+        static Log* getInstance();
+
         void setLevel(Level level);
 
         void setFile(const char* fileName);

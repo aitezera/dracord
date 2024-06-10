@@ -1,6 +1,15 @@
 #include "logging.h"
 // TODO: allow to customise the way the logger is displayed e.g (time, date, etc)
 
+Log* Log::instance = 0;
+
+Log* Log::getInstance() {
+    if (instance == 0) {
+        instance = new Log();
+    }
+    return instance;
+}
+
 void Log::setLevel(Level level)
 {
     m_LogLevel = level;
@@ -11,8 +20,10 @@ void Log::setFile(const char* fileName)
     m_File = fopen(fileName, "r");
     if (m_File == NULL)
     {
-        Log::Error(("Error opening file: " + std::string(fileName) + " creating file.").c_str());
+        Log::Error(("Error opening file: " + std::string(fileName) + " will create file and use it.").c_str());
         std::ofstream { fileName }; // Create file
+        Log::Info(("Created file: " + std::string(fileName)).c_str());
+        Log::Info(("Now using file: " + std::string(fileName)).c_str());
     }
     else {
         Log::Info(("Opened file: " + std::string(fileName)).c_str());

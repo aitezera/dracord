@@ -1,11 +1,13 @@
 # Remove build files
 dracord
+test
 *.exe
 *.out
 *.app
 *.bin
 *.o
 *.log
+.vscode
 
 # Ignore environment variables
 .env
