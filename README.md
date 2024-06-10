@@ -16,11 +16,11 @@ Dracord is an application built within SDL2 that uses the Discord API under the 
 > These features could not be implemented at all. <br/>
 > They're here for features I would "like" to add, but aren't certain to be added.
 
-- [x] Screensharing
-- [x] Functional Application
-- [x] Windows support
-- [x] Login through email and password (rather than token)
-- [x] 2FA support
+- [ ] Screensharing
+- [ ] Functional Application
+- [ ] Windows support
+- [ ] Login through email and password (rather than token)
+- [ ] 2FA support
 
 ## Prerequisites
 Before you begin, ensure you have met the following requirements:
