@@ -1,5 +1,5 @@
 ECC = g++
-FLAGS = -ljsoncpp -lSDL2_image -lcpr -I/usr/include/SDL2
+FLAGS = -ljsoncpp -lSDL2_image -lcpr -lSDL2 -I/usr/include/SDL2
 NAME = dracord
 SRC = src
 CPPFILES = $(foreach dir,$(SRC),$(wildcard $(dir)/*.cpp))
@@ -12,7 +12,7 @@ requirements:
 	@$(if $(shell ldconfig -p | grep libcpr), echo '[!] Found libcpr', echo '[X] libcpr was not found ' ;FORCEFAIL)
 
 all:
-	$(MAKE) requirements
+	requirements
 	$(info [!] Compiling all files within src)
 	$(ECC) -o $(NAME) $(CPPFILES) $(FLAGS)
 

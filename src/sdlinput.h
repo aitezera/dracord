@@ -7,16 +7,15 @@
 namespace sdlInput {
     constexpr int WIDTH = 640*2;
     constexpr int HEIGHT = 480*2;
-    inline bool running = true;
-
+    extern bool running;
 
     // SDL Variables
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-    SDL_Event event;
-    SDL_Surface* loadedSurface;
-    SDL_Texture* texture;
-    SDL_Rect sidebar;
+    extern SDL_Window* window;
+    extern SDL_Renderer* renderer;
+    extern SDL_Event event;
+    extern SDL_Surface* loadedSurface;
+    extern SDL_Texture* texture;
+    extern SDL_Rect sidebar;
 
     int createWindow(const char* windowName);
     int destroyWindow();
