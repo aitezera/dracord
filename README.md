@@ -1,7 +1,7 @@
-#Dracord
+# Dracord
 - A Discord client made using SDL2 (Beginner Project)
 
-#Prequeries
+# Prequeries
 SDL2
 SDL2_Image
 CPR
