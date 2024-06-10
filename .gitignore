@@ -1,4 +1,9 @@
-// Remove build files
+# Remove build files
 dracord
 *.exe
+*.out
+*.app
+*.bin
 
+# Ignore environment variables
+.env
