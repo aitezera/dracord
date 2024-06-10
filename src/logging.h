@@ -1,20 +1,27 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 
 class Log {
+    public:
+        enum Level : char {
+            LevelError = 0,
+            LevelWarning = 1,
+            LevelInfo = 2,
+        };
 
-    public:
-        enum Level : char {};
-    
     private:
-        Level m_LogLevel;
+        // Default logging level
+        Level m_LogLevel = LevelInfo;
+
+        // Set to NULL by default for printing to console
+        FILE* m_File = NULL;
     
     public:
-        void setLevel(Level level)
-        {
-            m_LogLevel = level;
-        }
+        void setLevel(Level level);
+
+        void setFile(const char* fileName);
 
         void Warn(const char* message);
 

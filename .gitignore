@@ -4,6 +4,8 @@ dracord
 *.out
 *.app
 *.bin
+*.o
+*.log
 
 # Ignore environment variables
 .env

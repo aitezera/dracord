@@ -7,9 +7,9 @@ Dracord is an application built within SDL2 that uses the Discord API under the 
 > Do not expect some features to work correctly or to be implemented at all.
 
 
-## Current Features
-- Access to user's friends, guilds, channels, and messages
-- Error handling for various HTTP status codes
+## Features
+- [x] Access to user's friends, guilds, channels, and messages
+- [x] Error handling for various HTTP status codes
 
 ## Planned Features
 > [!CAUTION]
