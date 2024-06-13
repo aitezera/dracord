@@ -15,6 +15,7 @@ class Requests {
         int login_user();
     private:
         string token;
+        
 
         void load_friends();
         void load_guilds();
