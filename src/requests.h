@@ -13,8 +13,22 @@ class Requests {
         }
 
         int login_user();
+
+        void updateHeaders() {
+            headers["Authorization"] = token; // Set Headers upon receiving token. Otherwise this will be empty and fail
+        }
+
     private:
         string token;
+
+        cpr::Header headers = {
+            {"Content-Type", "application/json"},
+            {"Authorization", token}
+        };
+
+        // Read and write token to file
+        void save_token(const std::string& filename);
+        void load_token(const std::string& filename);
         
 
         void load_friends();

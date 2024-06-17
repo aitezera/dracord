@@ -1,6 +1,6 @@
 # Remove build files
 dracord
-test
+token
 *.exe
 *.out
 *.app

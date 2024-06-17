@@ -11,12 +11,23 @@ requirements:
 	@$(if $(shell ldconfig -p | grep libjsoncpp), echo '[!] Found libjsoncpp', echo '[X] libjsoncpp was not found ' ;FORCEFAIL)
 	@$(if $(shell ldconfig -p | grep libcpr), echo '[!] Found libcpr', echo '[X] libcpr was not found ' ;FORCEFAIL)
 
-all:
-	requirements
+all: requirements
 	$(info [!] Compiling all files within src)
 	$(ECC) -o $(NAME) $(CPPFILES) $(FLAGS)
 
 # This is here to only test SDL2 rather than requesting to the Discord API
 # This will be removed upon actually having them linked together.
-debug:
+client:
 	$(ECC) -o $(NAME) src/main.cpp src/sdlinput.cpp src/logging.cpp $(FLAGS)
+
+
+# This is to test the requests being made to the Discord API
+requests:
+	$(ECC) -o $(NAME) src/requests.cpp src/logging.cpp $(FLAGS)
+
+# As it gets more bigger, it will eventually be split into multiple directories and such. 
+# If that happens, this will be updated to reflect that.
+clean:
+	$(info [!] Cleaning up)
+	@rm -f $(NAME)
+	$(info [!] Cleaned up the folder)
