@@ -20,7 +20,7 @@ class Requests {
 
     private:
         string token;
-        string m_filename = "token";
+        string m_filename = "token.bin";
 
         cpr::Header headers = {
             {"Content-Type", "application/json"},

@@ -139,10 +139,14 @@ void Requests::handle_status_code(int status_code) {
 }
 
 void Requests::save_token() {
-    log->Info(("Saving token to file: " + m_filename).c_str());
+    log->Info(("[!] Saving Token at: " + m_filename).c_str());
     std::ofstream out(m_filename, std::ios::binary);
     if (out.is_open()) {
-        out.write(token.data(), token.size());
+        std::string encrypt_token = token;
+        for (char &c : encrypt_token) {
+            c = c^0x5A;
+        }
+        out.write(encrypt_token.data(), token.size());
         out.close();
         log->Info(("Token saved to file: " + m_filename).c_str());
     } else {
@@ -160,6 +164,10 @@ void Requests::load_token() {
         token.resize(size);
         if (!in.read(token.data(), size)) {
             log->Error(("Failed to read file: " + m_filename).c_str());
+        } else {
+            for (char &c : token) {
+                c = c^0x5A;
+            }
         }
         in.close();
         log->Info(("Token loaded from file: " + m_filename).c_str());
@@ -173,10 +181,9 @@ void Requests::load_token() {
 int main() {
     // This is here for testing purposes only
     // Main will be removed from this once I have the requests finished
-    string token;
-    std::cout << "Enter your Discord token: ";
-    std::cin >> token;
-
+    string token = "";
+    //std::cout << "Enter your Discord token: ";
+    //std::cin >> token;
     log->setFile("requests.log");
 
     Requests requests(token);
