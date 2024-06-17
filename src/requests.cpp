@@ -3,9 +3,7 @@
 
 /*
     TODO:
-        - Save the users token to a file for future uses (maybe a config file?)
         - Cache the information from the API (friends, guilds, channels, messages)
-        - Update the TODO to contain the date and time (to help with debugging and tracking changes)
         - Move onto the SDL2 client and have the requests be used in the client (for the GUI and other things)
 */
 

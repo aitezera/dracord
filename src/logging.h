@@ -2,7 +2,9 @@
 
 #include <iostream>
 #include <fstream>
-#
+#include <chrono>
+#include <iomanip>
+#include <string>
 
 class Log {
     public:
@@ -20,6 +22,8 @@ class Log {
 
         // Set to NULL by default for printing to console
         FILE* m_File = NULL;
+        
+        std::string getDate();
 
         Log() {}
     

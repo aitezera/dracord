@@ -15,6 +15,18 @@ void Log::setLevel(Level level)
     m_LogLevel = level;
 }
 
+
+std::string Log::getDate()
+{
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d | %X");
+
+    return ss.str();
+}
+
 void Log::setFile(const char* fileName)
 {
     m_File = fopen(fileName, "r");
@@ -35,9 +47,9 @@ void Log::Warn(const char* message)
 {
     if (m_LogLevel >= LevelWarning)
         if (m_File != NULL)
-            fprintf(m_File, "[WARNING]: %s\n", message);
+            fprintf(m_File, "(%s) [WARNING]: %s\n", getDate().c_str(), message);
         else
-            std::cout << "[WARNING]: " << message << std::endl;
+            std::cout << ("%s [WARNING]: ", getDate().c_str()) << message << std::endl;
             std::flush(std::cout);
 }
 
@@ -45,9 +57,9 @@ void Log::Error(const char* message)
 {
     if (m_LogLevel >= LevelError)
         if (m_File != NULL)
-            fprintf(m_File, "[ERROR]: %s\n", message);
+            fprintf(m_File, "(%s) [ERROR]: %s\n", getDate().c_str(), message);
         else
-            std::cout << "[ERROR]: " << message << std::endl;
+            std::cout << ("%s [ERROR]: ", getDate().c_str()) << message << std::endl;
             std::flush(std::cout);
 }
 
@@ -55,8 +67,8 @@ void Log::Info(const char* message)
 {
     if (m_LogLevel >= LevelInfo)
         if (m_File != NULL)
-            fprintf(m_File, "[INFO]: %s\n", message);
+            fprintf(m_File, "(%s) [INFO]: %s\n", getDate().c_str(), message);
         else
-            std::cout << "[INFO]: " << message << std::endl;
+            fprintf(m_File, "(%s) [INFO]: %s\n", getDate().c_str(), message);
             std::flush(std::cout);
 }
