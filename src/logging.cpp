@@ -49,7 +49,7 @@ void Log::Warn(const char* message)
         if (m_File != NULL)
             fprintf(m_File, "(%s) [WARNING]: %s\n", getDate().c_str(), message);
         else
-            std::cout << ("%s [WARNING]: ", getDate().c_str()) << message << std::endl;
+            std::cout << ("(%s) [WARNING]: ", getDate().c_str()) << message << std::endl;
             std::flush(std::cout);
 }
 
@@ -59,7 +59,7 @@ void Log::Error(const char* message)
         if (m_File != NULL)
             fprintf(m_File, "(%s) [ERROR]: %s\n", getDate().c_str(), message);
         else
-            std::cout << ("%s [ERROR]: ", getDate().c_str()) << message << std::endl;
+            std::cout << ("(%s) [ERROR]: ", getDate().c_str()) << message << std::endl;
             std::flush(std::cout);
 }
 
@@ -69,6 +69,6 @@ void Log::Info(const char* message)
         if (m_File != NULL)
             fprintf(m_File, "(%s) [INFO]: %s\n", getDate().c_str(), message);
         else
-            fprintf(m_File, "(%s) [INFO]: %s\n", getDate().c_str(), message);
+            std::cout << ("(%s) [INFO]: ", getDate().c_str()) << message << std::endl;
             std::flush(std::cout);
 }

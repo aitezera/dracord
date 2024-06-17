@@ -26,6 +26,12 @@ class Log {
         std::string getDate();
 
         Log() {}
+        
+        ~Log() {
+            if (m_File != NULL) {
+                fclose(m_File);
+            }
+        }
     
     public:
         static Log* getInstance();
