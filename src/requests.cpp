@@ -9,18 +9,16 @@
         - Move onto the SDL2 client and have the requests be used in the client (for the GUI and other things)
 */
 
-Log* log = Log::getInstance(); // Get the instance of the logger
+Log* log = Log::getInstance(); // Create a new instance of the Log class
 
 int Requests::login_user() {
-    log->Info("[!] Logging user in with Discord API");
+    log->Info("[!] Attempting logging user in with Discord API");
     
-    if (token.empty()) {
-        load_token("token");
-    }
-
-    if (token.empty()) {
+    if (token.empty() && !std::ifstream(m_filename).good()) {
         handle_status_code(401);
         return 1;
+    } else {
+        load_token();
     }
 
     log->Info("[!] Updating Headers to include the token");
@@ -46,9 +44,9 @@ int Requests::login_user() {
     log->Info("[!] User logged in successfully!");
     log->Info("[!] Saving Token to file");
 
-    if (!std::ifstream("token").good()) {
+    if (!std::ifstream(m_filename).good()) {
         log->Info("[!] Token has not been saved. Saving it now");
-        save_token("token");
+        save_token();
     }
 
     return 0;
@@ -140,34 +138,34 @@ void Requests::handle_status_code(int status_code) {
     }
 }
 
-void Requests::save_token(const std::string& filename) {
-    log->Info(("Saving token to file: " + filename).c_str());
-    std::ofstream out(filename, std::ios::binary);
+void Requests::save_token() {
+    log->Info(("Saving token to file: " + m_filename).c_str());
+    std::ofstream out(m_filename, std::ios::binary);
     if (out.is_open()) {
         out.write(token.data(), token.size());
         out.close();
-        log->Info(("Token saved to file: " + filename).c_str());
+        log->Info(("Token saved to file: " + m_filename).c_str());
     } else {
-        log->Error(("Failed to open file for writing: " + filename).c_str());
+        log->Error(("Failed to open file for writing: " + m_filename).c_str());
     }
 }
 
-void Requests::load_token(const std::string& filename) {
-    log->Info(("Loading token from file: " + filename).c_str());
-    std::ifstream in(filename, std::ios::binary | std::ios::ate);
+void Requests::load_token() {
+    log->Info(("Loading token from file: " + m_filename).c_str());
+    std::ifstream in(m_filename, std::ios::binary | std::ios::ate);
     if (in.is_open()) {
         std::streamsize size = in.tellg();
         in.seekg(0, std::ios::beg);
 
         token.resize(size);
         if (!in.read(token.data(), size)) {
-            log->Error(("Failed to read file: " + filename).c_str());
+            log->Error(("Failed to read file: " + m_filename).c_str());
         }
         in.close();
-        log->Info(("Token loaded from file: " + filename).c_str());
+        log->Info(("Token loaded from file: " + m_filename).c_str());
         log->Info(("Token: " + token).c_str());
     } else {
-        log->Error(("Failed to open file for reading: " + filename).c_str());
+        log->Error(("Failed to open file for reading: " + m_filename).c_str());
     }
 }
 

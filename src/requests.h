@@ -20,6 +20,7 @@ class Requests {
 
     private:
         string token;
+        string m_filename = "token";
 
         cpr::Header headers = {
             {"Content-Type", "application/json"},
@@ -27,8 +28,8 @@ class Requests {
         };
 
         // Read and write token to file
-        void save_token(const std::string& filename);
-        void load_token(const std::string& filename);
+        void save_token();
+        void load_token();
         
 
         void load_friends();
