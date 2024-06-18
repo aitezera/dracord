@@ -7,7 +7,7 @@
 class Messages {
     public:
         Messages() {}
-        virtual ~Messages() {}
+        ~Messages() {}
 
         // Overloaded send_message functions
         virtual void send_message(std::string message) = 0;

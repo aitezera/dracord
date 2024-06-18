@@ -6,8 +6,9 @@
 
 class Guild {
     public:
-        Guild();
-        ~Guild();
+        Guild() {}
+        ~Guild() {}
+        
         void add_member();
         void remove_member();
         void promote_member();

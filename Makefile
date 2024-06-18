@@ -2,7 +2,10 @@ ECC = g++
 FLAGS = -ljsoncpp -lSDL2_image -lcpr -lSDL2 -I/usr/include/SDL2
 NAME = dracord
 SRC = src
+INCLUDE = include
+
 CPPFILES = $(foreach dir,$(SRC),$(wildcard $(dir)/*.cpp))
+HPPFILES = $(foreach dir,$(INCLUDE),$(wildcard $(dir)/*.hpp))
 
 requirements:
 	@echo [!] Checking required libraries are installed
@@ -13,17 +16,16 @@ requirements:
 
 all: requirements
 	$(info [!] Compiling all files within src)
-	$(ECC) -o $(NAME) $(CPPFILES) $(FLAGS)
+	$(ECC) -o $(NAME) $(CPPFILES) -I $(INCLUDE) $(FLAGS)
 
 # This is here to only test SDL2 rather than requesting to the Discord API
 # This will be removed upon actually having them linked together.
 client:
-	$(ECC) -o $(NAME) src/main.cpp src/sdlinput.cpp src/logging.cpp $(FLAGS)
-
+	$(ECC) -o $(NAME) src/main.cpp src/sdlinput.cpp src/logging.cpp -I $(INCLUDE) $(FLAGS)
 
 # This is to test the requests being made to the Discord API
 requests:
-	$(ECC) -o $(NAME) src/requests.cpp src/logging.cpp $(FLAGS)
+	$(ECC) -o $(NAME) src/requests.cpp src/logging.cpp -I $(INCLUDE) $(FLAGS)
 
 # As it gets more bigger, it will eventually be split into multiple directories and such. 
 # If that happens, this will be updated to reflect that.
