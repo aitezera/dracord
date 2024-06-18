@@ -3,11 +3,29 @@
 #include <cpr/cpr.h>
 #include <iostream>
 #include <json/json.h>
+#include <string>
+#include <vector>
+#include <map>
+
+#include "friend.h"
+#include "guild.h"
+#include "channel.h"
+#include "messages.h"
+
 using std::string;
+using std::vector;
+using std::map;
 
 class Requests {
     public:
         string base_api = "https://discord.com/api/v9/";
+
+        
+        vector<Friend> friends;
+        map<string, Guild> guilds;
+        map<string, Channel> channels;
+        map<string, vector<Messages>> messages;
+
 
         Requests(string uToken) {
             token = uToken;  // Set token

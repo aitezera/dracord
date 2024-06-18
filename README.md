@@ -8,8 +8,9 @@ Dracord is an application built within SDL2 that uses the Discord API under the 
 
 
 ## Features
-- [x] Access to user's friends, guilds, channels, and messages
+- [x] Access to users friends, guilds, channels, and messages
 - [x] Error handling for various HTTP status codes
+- [x] Saves token and encrypts into a binary file (Can also reload the token)
 
 ## Planned Features
 > [!CAUTION]
@@ -21,6 +22,7 @@ Dracord is an application built within SDL2 that uses the Discord API under the 
 - [ ] Windows support
 - [ ] Login through email and password (rather than token)
 - [ ] 2FA support
+- [ ] Websocket support (listening for event types from Discord to make changes live and such, like typing indication etc)
 
 ## Prerequisites
 Before you begin, ensure you have met the following requirements:

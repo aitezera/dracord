@@ -32,8 +32,6 @@ int Requests::login_user() {
 
     log->Info(("Response: " + std::string(response.text)).c_str());
 
-    // TODO: Cache the user information
-
     //load_friends();
     //load_guilds();
     //load_channels();
