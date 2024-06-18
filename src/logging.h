@@ -21,7 +21,7 @@ class Log {
         Level m_LogLevel = LevelInfo;
         static Log* instance;
 
-        // Set to NULL by default for printing to console
+        // Set to nullptr by default for printing to console
         FILE* m_File = nullptr;
         
         std::string getDate();

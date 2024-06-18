@@ -148,6 +148,7 @@ void Requests::save_token() {
         log->Info(("Token saved to file: " + m_filename).c_str());
     } else {
         log->Error(("Failed to open file for writing: " + m_filename).c_str());
+        out.close();
     }
 }
 
@@ -168,9 +169,9 @@ void Requests::load_token() {
         }
         in.close();
         log->Info(("Token loaded from file: " + m_filename).c_str());
-        log->Info(("Token: " + token).c_str());
     } else {
         log->Error(("Failed to open file for reading: " + m_filename).c_str());
+        in.close();
     }
 }
 

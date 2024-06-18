@@ -11,7 +11,7 @@ Log* Log::getInstance() {
 
 void Log::destroyInstance() {
     if (instance != 0) {
-        instance->Info("Destroying Log instance"); // Call Info function using instance pointer
+        instance->Info("Destroying Log instance");
         delete instance;
         instance = nullptr;
     }
