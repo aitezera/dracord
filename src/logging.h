@@ -36,6 +36,8 @@ class Log {
     public:
         static Log* getInstance();
 
+        static void destroyInstance();
+
         void setLevel(Level level);
 
         void setFile(const char* fileName);

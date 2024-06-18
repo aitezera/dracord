@@ -1,6 +1,9 @@
 #include "sdlinput.h"
 #include "logging.h"
 
+
+Log* logger = Log::getInstance(); // Create a new instance of the Log class
+
 // Define the SDL variables
 namespace sdlInput {
     SDL_Window* window;
@@ -14,15 +17,13 @@ namespace sdlInput {
 
 int sdlInput::createWindow(const char* windowName)
 {
-    Log* log = Log::getInstance();
-
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
-        log->Error(("Failed to initialise SDL: " + std::string(SDL_GetError())).c_str());
+        logger->Error(("Failed to initialise SDL: " + std::string(SDL_GetError())).c_str());
         return 1;
     }
 
-    log->Info("SDL initialised successfully!");
+    logger->Info("SDL initialised successfully!");
 
     window = SDL_CreateWindow(
                             windowName,
@@ -33,40 +34,40 @@ int sdlInput::createWindow(const char* windowName)
     
     if (!window)
     { 
-        log->Error(("Failed to create window: " + std::string(SDL_GetError())).c_str());
+        logger->Error(("Failed to create window: " + std::string(SDL_GetError())).c_str());
         SDL_Quit();
         return 1;
     }
 
-    log->Info("Window created successfully!");
+    logger->Info("Window created successfully!");
 
     renderer = SDL_CreateRenderer(window, -1, 0);
 
     if (!renderer)
     {
-        log->Error(("Failed to create renderer: " + std::string(SDL_GetError())).c_str());
+        logger->Error(("Failed to create renderer: " + std::string(SDL_GetError())).c_str());
         SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
     }
 
-    log->Info("Renderer created successfully!");
+    logger->Info("Renderer created successfully!");
 
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
     {
-        log->Error(("SDL_Image could not be initialised! Error: " + std::string(IMG_GetError())).c_str());
+        logger->Error(("SDL_Image could not be initialised! Error: " + std::string(IMG_GetError())).c_str());
         SDL_DestroyWindow(window);
         SDL_DestroyRenderer(renderer);
         SDL_Quit();
         return 1;
     }
 
-    log->Info("SDL_Image initialised successfully!");
+    logger->Info("SDL_Image initialised successfully!");
 
     loadedSurface = IMG_Load("/media/Software/Code/C++/dracord/images/test.jpg");
     if (loadedSurface == nullptr)
     {
-        log->Error(("Unable to load image! Error: " + std::string(IMG_GetError())).c_str());
+        logger->Error(("Unable to load image! Error: " + std::string(IMG_GetError())).c_str());
         IMG_Quit();
         SDL_DestroyWindow(window);
         SDL_DestroyRenderer(renderer);
@@ -74,12 +75,12 @@ int sdlInput::createWindow(const char* windowName)
         return 1;
     }
 
-    log->Info("Image loaded successfully!");
+    logger->Info("Image loaded successfully!");
 
     texture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
     if (texture == nullptr)
     {
-        log->Error(("Unable to create texture! Error: " + std::string(SDL_GetError())).c_str());
+        logger->Error(("Unable to create texture! Error: " + std::string(SDL_GetError())).c_str());
         SDL_FreeSurface(loadedSurface);
         IMG_Quit();
         SDL_DestroyWindow(window);
@@ -88,7 +89,7 @@ int sdlInput::createWindow(const char* windowName)
         return 1;
     }
 
-    log->Info("Texture created successfully!");
+    logger->Info("Texture created successfully!");
     SDL_FreeSurface(loadedSurface);
     
     sdlInput::loopWindow();
@@ -98,8 +99,7 @@ int sdlInput::createWindow(const char* windowName)
 
 void sdlInput::loopWindow()
 {
-    Log* log = Log::getInstance();
-    log->Info("Creating loop to run window");
+    logger->Info("Creating loop to run window");
 
     while (running)
     {
@@ -121,21 +121,18 @@ void sdlInput::loopWindow()
         SDL_Delay(10);
     }
 
-    log->Info("Window loop ended");
+    logger->Info("Window loop ended");
     destroyWindow();
 }
 
 int sdlInput::destroyWindow()
 {
-    Log* log = Log::getInstance();
-
-    log->Info("Destroying window");
+    logger->Info("Destroying window");
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     IMG_Quit();
     SDL_Quit();
-
     return 0;
 }
 

@@ -9,6 +9,14 @@ Log* Log::getInstance() {
     return instance;
 }
 
+void Log::destroyInstance() {
+    if (instance != 0) {
+        instance->Info("Destroying Log instance"); // Call Info function using instance pointer
+        delete instance;
+        instance = nullptr;
+    }
+}
+
 void Log::setLevel(Level level)
 {
     m_LogLevel = level;
