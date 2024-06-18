@@ -1,10 +1,11 @@
 #pragma once
 
-#include <iostream>
 #include <fstream>
+#include <sstream>
+#include <iostream>
 #include <chrono>
+#include <ctime>
 #include <iomanip>
-#include <string>
 
 class Log {
     public:
@@ -21,17 +22,19 @@ class Log {
         static Log* instance;
 
         // Set to NULL by default for printing to console
-        FILE* m_File = NULL;
+        FILE* m_File = nullptr;
         
         std::string getDate();
 
         Log() {}
         
+        // Destructor to clean up resources
         ~Log() {
-            if (m_File != NULL) {
+            if (m_File != nullptr) {
                 fclose(m_File);
+                m_File = nullptr;
             }
-        }
+}
     
     public:
         static Log* getInstance();

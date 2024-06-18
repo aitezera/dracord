@@ -3,7 +3,7 @@
 
 int main()
 {
-    sdlInput::createWindow("Dracord");
+    int result = sdlInput::createWindow("Dracord");
     Log::destroyInstance();
-    return 0;
+    return result;
 }

@@ -1,9 +1,9 @@
 #include "logging.h"
 
-Log* Log::instance = 0;
+Log* Log::instance = nullptr;
 
 Log* Log::getInstance() {
-    if (instance == 0) {
+    if (instance == nullptr) {
         instance = new Log();
     }
     return instance;
@@ -36,8 +36,13 @@ std::string Log::getDate()
 
 void Log::setFile(const char* fileName)
 {
+    if (m_File != nullptr) {
+        fclose(m_File); // Close any files that are open
+        m_File = nullptr;
+    }
+
     m_File = fopen(fileName, "r");
-    if (m_File == NULL)
+    if (m_File == nullptr)
     {
         Log::Error(("Error opening file: " + std::string(fileName) + " will create file and use it.").c_str());
         std::ofstream { fileName }; // Create file
@@ -47,35 +52,42 @@ void Log::setFile(const char* fileName)
     else {
         Log::Info(("Opened file: " + std::string(fileName)).c_str());
     }
+
+    if (m_File != nullptr)
+        fclose(m_File); // Close read mode file
+
     m_File = fopen(fileName, "a");
 }
 
-void Log::Warn(const char* message)
-{
-    if (m_LogLevel >= LevelWarning)
-        if (m_File != NULL)
+void Log::Warn(const char* message) {
+    if (m_LogLevel >= LevelWarning) {
+        if (m_File != nullptr) {
             fprintf(m_File, "(%s) [WARNING]: %s\n", getDate().c_str(), message);
-        else
-            std::cout << ("(%s) [WARNING]: ", getDate().c_str()) << message << std::endl;
-            std::flush(std::cout);
+            fflush(m_File);
+        } else {
+            std::cout << "(" << getDate() << ") [WARNING]: " << message << std::endl;
+        }
+    }
 }
 
-void Log::Error(const char* message)
-{
-    if (m_LogLevel >= LevelError)
-        if (m_File != NULL)
+void Log::Error(const char* message) {
+    if (m_LogLevel >= LevelError) {
+        if (m_File != nullptr) {
             fprintf(m_File, "(%s) [ERROR]: %s\n", getDate().c_str(), message);
-        else
-            std::cout << ("(%s) [ERROR]: ", getDate().c_str()) << message << std::endl;
-            std::flush(std::cout);
+            fflush(m_File);
+        } else {
+            std::cout << "(" << getDate() << ") [ERROR]: " << message << std::endl;
+        }
+    }
 }
 
-void Log::Info(const char* message)
-{
-    if (m_LogLevel >= LevelInfo)
-        if (m_File != NULL)
+void Log::Info(const char* message) {
+    if (m_LogLevel >= LevelInfo) {
+        if (m_File != nullptr) {
             fprintf(m_File, "(%s) [INFO]: %s\n", getDate().c_str(), message);
-        else
-            std::cout << ("(%s) [INFO]: ", getDate().c_str()) << message << std::endl;
-            std::flush(std::cout);
+            fflush(m_File);
+        } else {
+            std::cout << "(" << getDate() << ") [INFO]: " << message << std::endl;
+        }
+    }
 }
