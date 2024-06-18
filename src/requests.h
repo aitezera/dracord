@@ -2,6 +2,7 @@
 
 #include <cpr/cpr.h>
 #include <iostream>
+#include <json/json.h>
 using std::string;
 
 class Requests {
@@ -32,10 +33,14 @@ class Requests {
         void load_token();
         
 
+        // API Requests
         void load_friends();
         void load_guilds();
         void load_channels();
         void load_messages();
+        
+        void send_server_message(long channel_id, string message);
+        void send_friend_message(long channel_id, string message);
 
         void handle_status_code(int status_code);
 };

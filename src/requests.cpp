@@ -34,10 +34,10 @@ int Requests::login_user() {
 
     // TODO: Cache the user information
 
-    load_friends();
-    load_guilds();
-    load_channels();
-    load_messages();
+    //load_friends();
+    //load_guilds();
+    //load_channels();
+    //load_messages();
 
     log->Info("[!] User logged in successfully!");
 
@@ -99,6 +99,7 @@ void Requests::load_channels() {
 
 void Requests::load_messages() {
     log->Info("[!] Loading Messages");
+    
 
     cpr::Response response = cpr::Get(cpr::Url{base_api + "users/@me/channels"}, headers=headers);
     log->Info(("Using GET response with URL: " + base_api + "users/@me/channels").c_str());
@@ -114,6 +115,49 @@ void Requests::load_messages() {
     // TODO: Cache it or something
 }
 
+void Requests::send_server_message(long channel_id, string message) {
+    log->Info("[!] Sending Server Message");
+
+    Json::Value json;
+    json["content"] = message;
+    json["tts"] = false;
+
+    Json::StreamWriterBuilder builder;
+    std::string json_string = Json::writeString(builder, json);
+
+    cpr::Response response = cpr::Post(cpr::Url{base_api + "channels/" + std::to_string(channel_id) + "/messages"}, cpr::Body{json_string}, headers=headers);
+    log->Info(("Using POST response with URL: " + base_api + "channels/" + std::to_string(channel_id) + "/messages").c_str());
+
+    if (response.status_code != 200) {
+        handle_status_code(response.status_code);
+        return;
+    }
+
+    log->Info(("Response: " + std::string(response.text)).c_str());
+}
+
+
+void Requests::send_friend_message(long channel_id, string message) {
+    log->Info("[!] Sending Friend Message");
+
+    Json::Value json;
+    json["content"] = message;
+    json["tts"] = false;
+
+    Json::StreamWriterBuilder builder;
+    std::string json_string = Json::writeString(builder, json);
+
+    cpr::Response response = cpr::Post(cpr::Url{base_api + "channels/" + std::to_string(channel_id) + "/messages"}, cpr::Body{json_string}, headers=headers);
+    log->Info(("Using POST response with URL: " + base_api + "channels/" + std::to_string(channel_id) + "/messages").c_str());
+
+    if (response.status_code != 200) {
+        handle_status_code(response.status_code);
+        return;
+    }
+
+    log->Info(("Response: " + std::string(response.text)).c_str());
+}
+
 
 void Requests::handle_status_code(int status_code) {
     switch (status_code) {
@@ -127,7 +171,13 @@ void Requests::handle_status_code(int status_code) {
             log->Error("Forbidden! You don't have permission.");
             break;
         case 404:
+            log->Error("Not Found! The resource you requested doesn't exist.");
+            break;
+        case 429:
             log->Error("Too Many Requests! You are being rate-limited.");
+            break;
+        case 502:
+            log->Error("Bad Gateway! The server was acting as a gateway or proxy and received an invalid response from the upstream server.");
             break;
         default:
             log->Error(("Error! Status code: " + std::to_string(status_code)).c_str());
@@ -179,9 +229,8 @@ void Requests::load_token() {
 int main() {
     // This is here for testing purposes only
     // Main will be removed from this once I have the requests finished
-    string token = "";
-    //std::cout << "Enter your Discord token: ";
-    //std::cin >> token;
+
+    string token = ""; // Set empty so that token grabs from file
     log->setFile("requests.log");
 
     Requests requests(token);
