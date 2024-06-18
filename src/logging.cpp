@@ -1,5 +1,4 @@
 #include "logging.h"
-// TODO: allow to customise the way the logger is displayed e.g (time, date, etc)
 
 Log* Log::instance = 0;
 

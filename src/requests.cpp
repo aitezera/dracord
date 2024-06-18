@@ -40,10 +40,9 @@ int Requests::login_user() {
     load_messages();
 
     log->Info("[!] User logged in successfully!");
-    log->Info("[!] Saving Token to file");
 
     if (!std::ifstream(m_filename).good()) {
-        log->Info("[!] Token has not been saved. Saving it now");
+        log->Info("[!] Saving Token for future use");
         save_token();
     }
 
