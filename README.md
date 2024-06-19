@@ -31,6 +31,7 @@ Before you begin, ensure you have met the following requirements:
   ```
   SDL2
   SDL2_Image
+  SDL2_ttf
   JSONCPP
   CPR
   ```

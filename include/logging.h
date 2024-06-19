@@ -50,3 +50,5 @@ class Log {
 
         void Info(const char* message);
 };
+
+extern Log* logger;

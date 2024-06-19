@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+#include "guild.h"
+
 class Channel : Guild {
     public:
         Channel() {}

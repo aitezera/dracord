@@ -33,10 +33,6 @@ class Requests {
 
         int login_user();
 
-        void updateHeaders() {
-            r_headers["Authorization"] = r_token; // Set Headers upon receiving token. Otherwise this will be empty and fail
-        }
-
     private:
         string r_token;
         string r_filename = "token.bin";
@@ -45,6 +41,10 @@ class Requests {
             {"Content-Type", "application/json"},
             {"Authorization", r_token}
         };
+
+        void updateHeaders() {
+            r_headers["Authorization"] = r_token; // Set Headers upon receiving token. Otherwise this will be empty and fail
+        }
 
         // Read and write token to file
         void save_token();

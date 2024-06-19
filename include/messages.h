@@ -5,6 +5,8 @@
 #include <vector>
 #include <json/json.h>
 
+#include "channel.h"
+
 class Messages : Channel {
     public:
         Messages() {}

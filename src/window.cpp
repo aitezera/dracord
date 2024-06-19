@@ -1,8 +1,6 @@
 #include "window.h"
 #include "logging.h"
 
-Log* logger = Log::getInstance(); // Create a new instance of the Log class
-
 int Window::createWindow(const char* windowName)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -39,6 +37,8 @@ int Window::createWindow(const char* windowName)
     }
 
     logger->Info("Renderer created successfully!");
+
+    w_font = load_font("assets/fonts/Roboto-Regular.ttf");
 
     /*
         if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
@@ -99,8 +99,7 @@ void Window::loopWindow()
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-
-        SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+        //SDL_RenderCopy(renderer, texture, nullptr, nullptr);
         
         // Create sidebar for guilds to go within
         sidebar.x = 0;
@@ -134,6 +133,8 @@ void Window::loopWindow()
         SDL_SetRenderDrawColor(renderer, c_mainCol.r, c_mainCol.g, c_mainCol.b, c_mainCol.a);
         SDL_RenderFillRect(renderer, &chat_window);
 
+        // Render text to screen
+        render_text(renderer, "I love big booty latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
         SDL_RenderPresent(renderer);
         SDL_Delay(100);
     }
@@ -144,24 +145,35 @@ void Window::loopWindow()
 
 int Window::destroyWindow()
 {
-    logger->Info("Destroying window");
-    
-    if (texture != nullptr) {
-        SDL_DestroyTexture(texture);
-        texture = nullptr;
-    }
+    logger->Info("Destroying all components of the Window");
+
+    //if (texture != nullptr) {
+    //    logger->Info("Destroying texture");
+    //    SDL_DestroyTexture(texture);
+    //    texture = nullptr;
+    //}
 
     if (renderer != nullptr) {
+        logger->Info("Destroying Renderer");
         SDL_DestroyRenderer(renderer);
         renderer = nullptr;
     }
 
     if (window != nullptr) {
+        logger->Info("Destroying Window");
         SDL_DestroyWindow(window);
         window = nullptr;
     }
 
-    IMG_Quit();
+    
+    if (w_font != nullptr) {
+        logger->Info("Destroying TTF Font Library");
+        TTF_CloseFont(w_font);
+        w_font = nullptr;
+    }
+
+    //IMG_Quit();
     SDL_Quit();
+    TTF_Quit();
     return 0;
 }

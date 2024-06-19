@@ -7,7 +7,7 @@
         - Move onto the SDL2 client and have the requests be used in the client (for the GUI and other things)
 */
 
-Log* logger = Log::getInstance(); // Create a new instance of the Log class
+
 
 int Requests::login_user() {
     logger->Info("[!] Attempting logging user in with Discord API");

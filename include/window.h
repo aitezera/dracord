@@ -2,9 +2,13 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+
 #include <iostream>
 
-class Window {
+#include "ui.h"
+
+class Window : UI {
     private:
         const int WIDTH = 640*2;
         const int HEIGHT = 480*2;
@@ -17,6 +21,7 @@ class Window {
         SDL_Event event;
         SDL_Surface* loadedSurface;
         SDL_Texture* texture;
+        TTF_Font* w_font;
         
         SDL_Rect sidebar;
         SDL_Rect friend_sidebar;

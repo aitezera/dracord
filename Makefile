@@ -1,5 +1,5 @@
 ECC = g++
-FLAGS = -ljsoncpp -lSDL2_image -lcpr -lSDL2 -I/usr/include/SDL2
+FLAGS = -ljsoncpp -lSDL2_image -lSDL2_ttf -lcpr -lSDL2 -I/usr/include/SDL2
 NAME = dracord
 SRC = src
 INCLUDE = include
@@ -21,7 +21,7 @@ all: requirements
 # This is here to only test SDL2 rather than requesting to the Discord API
 # This will be removed upon actually having them linked together.
 client:
-	$(ECC) -o $(NAME) src/main.cpp src/window.cpp src/logging.cpp -I $(INCLUDE) $(FLAGS)
+	$(ECC) -o $(NAME) src/main.cpp src/window.cpp src/ui.cpp src/logging.cpp -I $(INCLUDE) $(FLAGS)
 
 # This is to test the requests being made to the Discord API
 requests:

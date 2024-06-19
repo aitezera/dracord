@@ -1,11 +1,17 @@
 #include "window.h"
 #include "logging.h"
 
+Log* logger = Log::getInstance();
+
 int main()
 {
     Window window;
-    window.createWindow("Dracord");
-    
-    Log::destroyInstance();
+    if (window.createWindow("Dracord") != 0)
+    {
+        logger->Error("Failed to create window");
+        return 1;
+    }
+
+    logger->destroyInstance();
     return 0;
 }
