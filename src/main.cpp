@@ -9,6 +9,7 @@ int main()
     if (window.createWindow("Dracord") != 0)
     {
         logger->Error("Failed to create window");
+        logger->destroyInstance();
         return 1;
     }
 

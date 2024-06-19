@@ -81,7 +81,9 @@ int Window::createWindow(const char* windowName)
     SDL_FreeSurface(loadedSurface);
     */
 
-    return loopWindow();
+    loopWindow();
+
+    return 0;
 }
 
 int Window::loopWindow()
@@ -101,45 +103,31 @@ int Window::loopWindow()
         //SDL_RenderCopy(renderer, texture, nullptr, nullptr);
         
         // Create sidebar for guilds to go within
-        sidebar.x = 0;
-        sidebar.y = 0;
-        sidebar.w = WIDTH / 15;
-        sidebar.h = HEIGHT;
         SDL_SetRenderDrawColor(renderer, c_sidebar.r, c_sidebar.g, c_sidebar.b, c_sidebar.a);
         SDL_RenderFillRect(renderer, &sidebar);
 
         // Create sidebar for friends to go within
-        friend_sidebar.x = sidebar.w;
-        friend_sidebar.y = 0;
-        friend_sidebar.w = WIDTH / 8;
-        friend_sidebar.h = HEIGHT;
         SDL_SetRenderDrawColor(renderer, c_friend_sidebar.r, c_friend_sidebar.g, c_friend_sidebar.b, c_friend_sidebar.a);
         SDL_RenderFillRect(renderer, &friend_sidebar);
 
         // Create topbar for the server
-        topbar.x = (friend_sidebar.w  + sidebar.w);
-        topbar.y = 0;
-        topbar.w = WIDTH - (WIDTH / 15) - (WIDTH / 15);
-        topbar.h = HEIGHT / 15;
         SDL_SetRenderDrawColor(renderer, c_mainCol.r, c_mainCol.g, c_mainCol.b, c_mainCol.a);
         SDL_RenderFillRect(renderer, &topbar);
 
         // Create chat window
-        chat_window.x = (friend_sidebar.w + sidebar.w);
-        chat_window.y = topbar.h;
-        chat_window.w = WIDTH - (WIDTH / 15) - (WIDTH / 15);
-        chat_window.h = HEIGHT - (HEIGHT / 15);
         SDL_SetRenderDrawColor(renderer, c_mainCol.r, c_mainCol.g, c_mainCol.b, c_mainCol.a);
         SDL_RenderFillRect(renderer, &chat_window);
 
         // Render text to screen
         render_text(renderer, "I love big booty latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
         SDL_RenderPresent(renderer);
-        SDL_Delay(100);
+        SDL_Delay(10);
     }
 
     logger->Info("Window loop ended");
-    return destroyWindow();
+    destroyWindow();
+
+    return 0;
 }
 
 int Window::destroyWindow()
@@ -164,7 +152,6 @@ int Window::destroyWindow()
         window = nullptr;
     }
 
-    
     if (w_font != nullptr) {
         logger->Info("Destroying TTF Font Library");
         TTF_CloseFont(w_font);
@@ -174,5 +161,6 @@ int Window::destroyWindow()
     //IMG_Quit();
     SDL_Quit();
     TTF_Quit();
+
     return 0;
 }

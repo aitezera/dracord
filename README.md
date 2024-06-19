@@ -23,11 +23,12 @@ Dracord is an application built within SDL2 that uses the Discord API under the 
 - [ ] Login through email and password (rather than token)
 - [ ] 2FA support
 - [ ] Websocket support (listening for event types from Discord to make changes live and such, like typing indication etc)
+- [ ] Fix the naming conventions used throughout the source code. (This is just something I want myself)
 
 ## Prerequisites
 Before you begin, ensure you have met the following requirements:
 
-- You have the following libraries installed either through a package manager or your OS of choice.
+- Install the following libraries either through a package manager or your OS of choice.
   ```
   SDL2
   SDL2_Image
