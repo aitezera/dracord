@@ -3,6 +3,7 @@ Dracord is an application built within SDL2 that uses the Discord API under the 
 
 
 > [!WARNING]
+> ### IN VERY EARLY DEVELOPMENT
 > This is a beginner project and my first proper project within C++. <br/>
 > Do not expect some features to work correctly or to be implemented at all.
 
@@ -22,8 +23,8 @@ Dracord is an application built within SDL2 that uses the Discord API under the 
 - [ ] Windows support
 - [ ] Login through email and password (rather than token)
 - [ ] 2FA support
-- [ ] Websocket support (listening for event types from Discord to make changes live and such, like typing indication etc)
-- [ ] Fix the naming conventions used throughout the source code. (This is just something I want myself)
+- [ ] Websocket support (listening for event types from Discord to make changes live)
+- [ ] Fix the naming conventions used throughout the source code. (Help maintain code)
 
 ## Prerequisites
 Before you begin, ensure you have met the following requirements:
