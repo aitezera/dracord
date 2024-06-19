@@ -18,38 +18,38 @@ using std::map;
 
 class Requests {
     public:
-        string base_api = "https://discord.com/api/v9/";
+        string r_base_api = "https://discord.com/api/v9/";
 
         
-        vector<Friend> friends;
-        map<string, Guild> guilds;
-        map<string, Channel> channels;
-        map<string, vector<Messages>> messages;
+        vector<Friend> r_friends;
+        map<string, Guild> r_guilds;
+        map<string, Channel> r_channels;
+        map<string, vector<Messages>> r_messages;
 
 
         Requests(string uToken) {
-            token = uToken;  // Set token
+            r_token = uToken;  // Set token
         }
 
         int login_user();
 
         void updateHeaders() {
-            headers["Authorization"] = token; // Set Headers upon receiving token. Otherwise this will be empty and fail
+            r_headers["Authorization"] = r_token; // Set Headers upon receiving token. Otherwise this will be empty and fail
         }
 
     private:
-        string token;
-        string m_filename = "token.bin";
+        string r_token;
+        string r_filename = "token.bin";
 
-        cpr::Header headers = {
+        cpr::Header r_headers = {
             {"Content-Type", "application/json"},
-            {"Authorization", token}
+            {"Authorization", r_token}
         };
 
         // Read and write token to file
         void save_token();
         void load_token();
-        
+    
 
         // API Requests
         void load_friends();
@@ -57,8 +57,8 @@ class Requests {
         void load_channels();
         void load_messages();
         
-        void send_server_message(long channel_id, string message);
-        void send_friend_message(long channel_id, string message);
+        void send_server_message(long r_channel_id, string r_message);
+        void send_friend_message(long r_channel_id, string r_message);
 
-        void handle_status_code(int status_code);
+        void handle_status_code(int r_status_code);
 };

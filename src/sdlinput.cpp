@@ -10,8 +10,15 @@ namespace sdlInput {
     SDL_Event event;
     SDL_Surface* loadedSurface = nullptr;
     SDL_Texture* texture = nullptr;
-    SDL_Rect sidebar;
     bool running = true;
+
+    // Components that will be used in the window
+    SDL_Rect sidebar;
+    SDL_Rect friend_sidebar;
+    SDL_Rect topbar;
+
+    SDL_Rect chat_window;
+    SDL_Rect chat_input;
 }
 
 int sdlInput::createWindow(const char* windowName)
@@ -47,42 +54,43 @@ int sdlInput::createWindow(const char* windowName)
 
     logger->Info("Renderer created successfully!");
 
-    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
-    {
-        logger->Error(("SDL_Image could not be initialized! Error: " + std::string(IMG_GetError())).c_str());
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return 1;
-    }
+    /*
+        if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
+        {
+            logger->Error(("SDL_Image could not be initialized! Error: " + std::string(IMG_GetError())).c_str());
+            SDL_DestroyRenderer(renderer);
+            SDL_DestroyWindow(window);
+            SDL_Quit();
+            return 1;
+        }
 
-    logger->Info("SDL_Image initialized successfully!");
+        logger->Info("SDL_Image initialized successfully!");
 
-    loadedSurface = IMG_Load("/media/Software/Code/C++/dracord/images/test.jpg");
-    if (loadedSurface == nullptr)
-    {
-        logger->Error(("Unable to load image! Error: " + std::string(IMG_GetError())).c_str());
-        IMG_Quit();
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return 1;
-    }
+        loadedSurface = IMG_Load("/media/Software/Code/C++/dracord/images/test.jpg");
+        if (loadedSurface == nullptr)
+        {
+            logger->Error(("Unable to load image! Error: " + std::string(IMG_GetError())).c_str());
+            IMG_Quit();
+            SDL_DestroyRenderer(renderer);
+            SDL_DestroyWindow(window);
+            SDL_Quit();
+            return 1;
+        }
 
-    logger->Info("Image loaded successfully!");
+        logger->Info("Image loaded successfully!");
 
-    texture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-    if (texture == nullptr)
-    {
-        logger->Error(("Unable to create texture! Error: " + std::string(SDL_GetError())).c_str());
-        SDL_FreeSurface(loadedSurface);
-        IMG_Quit();
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return 1;
-    }
-
+        texture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+        if (texture == nullptr)
+        {
+            logger->Error(("Unable to create texture! Error: " + std::string(SDL_GetError())).c_str());
+            SDL_FreeSurface(loadedSurface);
+            IMG_Quit();
+            SDL_DestroyRenderer(renderer);
+            SDL_DestroyWindow(window);
+            SDL_Quit();
+            return 1;
+        }
+    */
     logger->Info("Texture created successfully!");
     SDL_FreeSurface(loadedSurface);
 
@@ -102,15 +110,52 @@ void sdlInput::loopWindow()
             if (event.type == SDL_QUIT)
                 running = false;
         }
-
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+        
+        // Create sidebar for guilds to go within
+        sidebar.x = 0;
+        sidebar.y = 0;
+        sidebar.w = WIDTH / 15;
+        sidebar.h = HEIGHT;
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, &sidebar);
 
+        // Create sidebar for friends to go within
+        friend_sidebar.x = sidebar.w;
+        friend_sidebar.y = 0;
+        friend_sidebar.w = WIDTH / 8;
+        friend_sidebar.h = HEIGHT;
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &friend_sidebar);
+
+        // Create topbar for the server
+        topbar.x = (friend_sidebar.w  + sidebar.w);
+        topbar.y = 0;
+        topbar.w = WIDTH - (WIDTH / 15) - (WIDTH / 15);
+        topbar.h = HEIGHT / 15;
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderFillRect(renderer, &topbar);
+
+        // Create chat window
+        chat_window.x = (friend_sidebar.w + sidebar.w);
+        chat_window.y = topbar.h;
+        chat_window.w = WIDTH - (WIDTH / 15) - (WIDTH / 15);
+        chat_window.h = HEIGHT - (HEIGHT / 15) - (HEIGHT / 15);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        SDL_RenderFillRect(renderer, &chat_window);
+
+        // Create chat input
+        chat_input.x = (friend_sidebar.w + sidebar.w);
+        chat_input.y = HEIGHT - (HEIGHT / 15);
+        chat_input.w = WIDTH - (WIDTH / 15) - (WIDTH / 15);
+        chat_input.h = HEIGHT / 15;
+        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+        SDL_RenderFillRect(renderer, &chat_input);
         SDL_RenderPresent(renderer);
+
         SDL_Delay(10);
     }
 
@@ -136,12 +181,4 @@ int sdlInput::destroyWindow()
     IMG_Quit();
     SDL_Quit();
     return 0;
-}
-
-void sdlInput::updateMessages() {
-    std::cout << "I will do this later" << std::endl;
-}
-
-void sdlInput::updateServers() {
-    std::cout << "I will do this later" << std::endl;
 }

@@ -9,13 +9,12 @@
 
 class Log {
     public:
-        enum Level : char {
+        enum Level {
             LevelError = 0,
             LevelWarning = 1,
             LevelInfo = 2,
         };
-        
-
+    
     private:
         // Default logging level
         Level m_LogLevel = LevelInfo;
@@ -34,7 +33,7 @@ class Log {
                 fclose(m_File);
                 m_File = nullptr;
             }
-}
+        }
     
     public:
         static Log* getInstance();

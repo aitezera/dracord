@@ -20,8 +20,4 @@ namespace sdlInput {
     int createWindow(const char* windowName);
     int destroyWindow();
     void loopWindow();
-
-    // Dracord related instances
-    void updateServers();
-    void updateMessages();
 }
