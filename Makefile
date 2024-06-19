@@ -21,7 +21,7 @@ all: requirements
 # This is here to only test SDL2 rather than requesting to the Discord API
 # This will be removed upon actually having them linked together.
 client:
-	$(ECC) -o $(NAME) src/main.cpp src/sdlinput.cpp src/logging.cpp -I $(INCLUDE) $(FLAGS)
+	$(ECC) -o $(NAME) src/main.cpp src/window.cpp src/logging.cpp -I $(INCLUDE) $(FLAGS)
 
 # This is to test the requests being made to the Discord API
 requests:

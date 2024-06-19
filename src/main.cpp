@@ -1,9 +1,11 @@
-#include "sdlinput.h"
+#include "window.h"
 #include "logging.h"
 
 int main()
 {
-    int result = sdlInput::createWindow("Dracord");
+    Window window;
+    window.createWindow("Dracord");
+    
     Log::destroyInstance();
-    return result;
+    return 0;
 }

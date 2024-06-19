@@ -1,27 +1,9 @@
-#include "sdlinput.h"
+#include "window.h"
 #include "logging.h"
 
 Log* logger = Log::getInstance(); // Create a new instance of the Log class
 
-// Define the SDL variables
-namespace sdlInput {
-    SDL_Window* window = nullptr;
-    SDL_Renderer* renderer = nullptr;
-    SDL_Event event;
-    SDL_Surface* loadedSurface = nullptr;
-    SDL_Texture* texture = nullptr;
-    bool running = true;
-
-    // Components that will be used in the window
-    SDL_Rect sidebar;
-    SDL_Rect friend_sidebar;
-    SDL_Rect topbar;
-
-    SDL_Rect chat_window;
-    SDL_Rect chat_input;
-}
-
-int sdlInput::createWindow(const char* windowName)
+int Window::createWindow(const char* windowName)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
@@ -31,7 +13,11 @@ int sdlInput::createWindow(const char* windowName)
 
     logger->Info("SDL initialized successfully!");
 
-    window = SDL_CreateWindow(windowName, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow(windowName, 
+                        SDL_WINDOWPOS_CENTERED, 
+                        SDL_WINDOWPOS_CENTERED, 
+                        WIDTH, HEIGHT,
+                        SDL_WINDOW_SHOWN);
 
     if (!window)
     { 
@@ -90,16 +76,16 @@ int sdlInput::createWindow(const char* windowName)
             SDL_Quit();
             return 1;
         }
-    */
+  
     logger->Info("Texture created successfully!");
     SDL_FreeSurface(loadedSurface);
-
-    sdlInput::loopWindow();
+    */
+    loopWindow();
 
     return 0;
 }
 
-void sdlInput::loopWindow()
+void Window::loopWindow()
 {
     logger->Info("Creating loop to run window");
 
@@ -110,6 +96,7 @@ void sdlInput::loopWindow()
             if (event.type == SDL_QUIT)
                 running = false;
         }
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
@@ -120,7 +107,7 @@ void sdlInput::loopWindow()
         sidebar.y = 0;
         sidebar.w = WIDTH / 15;
         sidebar.h = HEIGHT;
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_SetRenderDrawColor(renderer, c_sidebar.r, c_sidebar.g, c_sidebar.b, c_sidebar.a);
         SDL_RenderFillRect(renderer, &sidebar);
 
         // Create sidebar for friends to go within
@@ -128,7 +115,7 @@ void sdlInput::loopWindow()
         friend_sidebar.y = 0;
         friend_sidebar.w = WIDTH / 8;
         friend_sidebar.h = HEIGHT;
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer, c_friend_sidebar.r, c_friend_sidebar.g, c_friend_sidebar.b, c_friend_sidebar.a);
         SDL_RenderFillRect(renderer, &friend_sidebar);
 
         // Create topbar for the server
@@ -136,48 +123,44 @@ void sdlInput::loopWindow()
         topbar.y = 0;
         topbar.w = WIDTH - (WIDTH / 15) - (WIDTH / 15);
         topbar.h = HEIGHT / 15;
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_SetRenderDrawColor(renderer, c_mainCol.r, c_mainCol.g, c_mainCol.b, c_mainCol.a);
         SDL_RenderFillRect(renderer, &topbar);
 
         // Create chat window
         chat_window.x = (friend_sidebar.w + sidebar.w);
         chat_window.y = topbar.h;
         chat_window.w = WIDTH - (WIDTH / 15) - (WIDTH / 15);
-        chat_window.h = HEIGHT - (HEIGHT / 15) - (HEIGHT / 15);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        chat_window.h = HEIGHT - (HEIGHT / 15);
+        SDL_SetRenderDrawColor(renderer, c_mainCol.r, c_mainCol.g, c_mainCol.b, c_mainCol.a);
         SDL_RenderFillRect(renderer, &chat_window);
 
-        // Create chat input
-        chat_input.x = (friend_sidebar.w + sidebar.w);
-        chat_input.y = HEIGHT - (HEIGHT / 15);
-        chat_input.w = WIDTH - (WIDTH / 15) - (WIDTH / 15);
-        chat_input.h = HEIGHT / 15;
-        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-        SDL_RenderFillRect(renderer, &chat_input);
         SDL_RenderPresent(renderer);
-
-        SDL_Delay(10);
+        SDL_Delay(100);
     }
 
     logger->Info("Window loop ended");
     destroyWindow();
 }
 
-int sdlInput::destroyWindow()
+int Window::destroyWindow()
 {
     logger->Info("Destroying window");
+    
     if (texture != nullptr) {
         SDL_DestroyTexture(texture);
         texture = nullptr;
     }
+
     if (renderer != nullptr) {
         SDL_DestroyRenderer(renderer);
         renderer = nullptr;
     }
+
     if (window != nullptr) {
         SDL_DestroyWindow(window);
         window = nullptr;
     }
+
     IMG_Quit();
     SDL_Quit();
     return 0;
