@@ -80,12 +80,11 @@ int Window::createWindow(const char* windowName)
     logger->Info("Texture created successfully!");
     SDL_FreeSurface(loadedSurface);
     */
-    loopWindow();
 
-    return 0;
+    return loopWindow();
 }
 
-void Window::loopWindow()
+int Window::loopWindow()
 {
     logger->Info("Creating loop to run window");
 
@@ -140,7 +139,7 @@ void Window::loopWindow()
     }
 
     logger->Info("Window loop ended");
-    destroyWindow();
+    return destroyWindow();
 }
 
 int Window::destroyWindow()

@@ -34,5 +34,5 @@ class Window : UI {
 
         int createWindow(const char* windowName);
         int destroyWindow();
-        void loopWindow();
+        int loopWindow();
 };
