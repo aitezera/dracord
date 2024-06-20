@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 
 #include <iostream>
+#include <memory>
 
 #include "ui.h"
 
@@ -12,16 +13,16 @@ class Window : UI {
     private:
         const int WIDTH = 640*2;
         const int HEIGHT = 480*2;
-        bool running;
+        bool running = true;
 
     public:
         // SDL Variables
-        SDL_Window* window;
-        SDL_Renderer* renderer;
-        SDL_Event event;
-        SDL_Surface* loadedSurface;
-        SDL_Texture* texture;
-        TTF_Font* w_font;
+        SDL_Window* window = nullptr;
+        SDL_Renderer* renderer = nullptr;
+        SDL_Event event = { 0 };
+        //SDL_Surface* loadedSurface = nullptr;
+        //SDL_Texture* texture = nullptr;
+        TTF_Font* w_font = nullptr;
         
         SDL_Rect sidebar { 0, 0, WIDTH / 8, HEIGHT };
         SDL_Rect friend_sidebar { sidebar.x, 0, WIDTH / 8, HEIGHT };
