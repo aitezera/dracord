@@ -6,7 +6,6 @@
 #include <chrono>
 #include <ctime>
 #include <iomanip>
-
 class Log {
     public:
         enum Level {

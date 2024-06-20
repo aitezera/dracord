@@ -6,6 +6,8 @@
         - Cache the information from the API (friends, guilds, channels, messages)
         - Move onto the SDL2 client and have the requests be used in the client (for the GUI and other things)
 */
+// This needs to be here for now until I link it with the main file
+Log* logger = Log::getInstance();
 
 int Requests::login_user() {
     logger->Info("[!] Attempting logging user in with Discord API");
