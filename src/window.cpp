@@ -38,7 +38,18 @@ int Window::createWindow(const char* windowName)
 
     logger->Info("Renderer created successfully!");
 
-    w_font = load_font("assets/fonts/Roboto-Regular.ttf");
+    std::string fontPath = getFontPath("Roboto-Regular.ttf");
+
+    if (fontPath.empty())
+    {
+        logger->Error("Failed to fetch font path");
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+    
+    w_font = load_font(fontPath.c_str());
 
     /*
         if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
@@ -88,7 +99,7 @@ int Window::createWindow(const char* windowName)
 
 int Window::loopWindow()
 {
-    logger->Info("Creating loop to run window");
+    logger->Info("Looping SDL2 Window");
 
     while (running)
     {
@@ -119,7 +130,7 @@ int Window::loopWindow()
         SDL_RenderFillRect(renderer, &chat_window);
 
         // Render text to screen
-        render_text(renderer, "I love big booty latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
+        render_text(renderer, "I love SDL2", { 255, 255, 255, 255 }, 10, 10, w_font);
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
     }

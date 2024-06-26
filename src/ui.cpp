@@ -2,6 +2,7 @@
 #include "logging.h"
 
 TTF_Font* UI::load_font(const char* file) {
+    
     if (TTF_Init() == -1) {
         logger->Error(("Failed to initialize TTF: " + std::string(TTF_GetError())).c_str());
     }
@@ -42,4 +43,28 @@ void UI::render_text(SDL_Renderer* renderer, const char* text, SDL_Color color, 
 
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
+}
+
+std::string UI::getFontPath(const std::string& fontName) {
+    // Get the path to the current executable
+    fs::path execPath = fs::current_path();
+
+    // Go back one or two directories to ensure it's within "dracord"
+    // This will unfortunately break if the executable is moved
+    // Need to find a better way to do this
+    execPath = execPath.parent_path().parent_path();
+
+    logger->Info(("Current path: " + execPath.string()).c_str());
+
+    // Append the path to the font file
+    fs::path fontPath = execPath / "assets" / "fonts" / fontName;
+
+    // Check if the font file exists
+    // If not return an empty string
+    if (!fs::exists(fontPath)) {
+        logger->Error(("Font file does not exist: " + fontPath.string()).c_str());
+        return "";
+    }
+
+    return fontPath.string();
 }

@@ -41,7 +41,7 @@ void Log::setFile(const char* fileName)
         m_File = nullptr;
     }
 
-    m_File = fopen(fileName, "r");
+    fopen_s(&m_File, fileName, "r");
     if (m_File == nullptr)
     {
         Log::Error(("Error opening file: " + std::string(fileName) + " will create file and use it.").c_str());
@@ -56,7 +56,7 @@ void Log::setFile(const char* fileName)
     if (m_File != nullptr)
         fclose(m_File); // Close read mode file
 
-    m_File = fopen(fileName, "a");
+    fopen_s(&m_File, fileName, "a");
 }
 
 void Log::Warn(const char* message) {

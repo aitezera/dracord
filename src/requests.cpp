@@ -224,7 +224,7 @@ void Requests::load_token() {
 }
 
 // Comment this out for make all
-int main() {
+/*int main() {
     // This is here for testing purposes only
     // Main will be removed from this once I have the requests finished
 
@@ -233,4 +233,4 @@ int main() {
 
     Requests requests(token);
     return requests.login_user();
-}
+}*/

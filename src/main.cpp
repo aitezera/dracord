@@ -3,7 +3,7 @@
 
 Log* logger = Log::getInstance();
 
-int main()
+int SDL_main(int argc, char* argv[])
 {
     Window window;
     if (window.createWindow("Dracord") != 0)

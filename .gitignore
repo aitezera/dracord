@@ -1,6 +1,7 @@
 # Remove build files
 dracord
 token
+nul
 *.exe
 *.out
 *.app
@@ -9,6 +10,9 @@ token
 *.log
 *.txt
 .vscode
+
+# Ignore build
+build/
 
 # Ignore environment variables
 .env
