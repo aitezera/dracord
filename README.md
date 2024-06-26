@@ -33,14 +33,14 @@ Before you begin, ensure you have met the following requirements:
   JSONCPP
   CPR
   ```
-  If you're using Arch Linux you can use yay with the following command
+  If you're using Arch Linux you can use yay with the following command <br>
   ` yay -Sy sdl2pp cpr && sudo pacman -Sy jsoncpp `
 
-  Windows users, I would much recommended installing vcpkg and running the command
+  Windows users, I would much recommended installing vcpkg and running the command <br>
   ` vckpkg install sdl2pp jsoncpp cpr `
 
-- Ensure CMake is installed on your system. It can be installed from their officical website: [CMAKE Website](https://cmake.org/download/) <br>
-  Arch users can install cmake through pacman -> ` sudo pacman -Sy cmake `
+- Ensure CMake is installed on your system. It can be installed from their officical website: [CMake Website](https://cmake.org/download/) <br>
+  Arch users can install CMake through pacman -> ` sudo pacman -Sy cmake `
 
 - Have a Discord account (obvious one)
 
@@ -54,12 +54,12 @@ To install the Dracord, follow these steps:
 4. Change Directory to build ` cd build `
 5. Run ` cmake -S .. -B . ` 
 > [!IMPORTANT]
-> If you're using vcpkg you will need to specify the path the vcpkg.cmake using `-DCMAKE_TOOLCHAIN_FILE=` <br>
-> It is normally found within your vcpkg folder (wherever you had installed it to): `/vcpkg/scripts/buildsystems/`
+> If you're using vcpkg you will need to specify the path to vcpkg.cmake using `-DCMAKE_TOOLCHAIN_FILE=` <br>
+> To find vcpkg.make it is normally under your vcpkg path file. And example: `C:\User\[NAME]\vcpkg\scripts\buildsystems\`
 6. Run ` cmake --build . `
 > [!IMPORTANT]
 > You may also specify certain targets that I had created for testing purposes. Those being client and requests <br>
-> To run them use the following command ` cmake --build . --target [TARGET_NAME] `, replacing [TARGET_NAME] with client or requests.
+> To run them use the following command ` cmake --build . --target [TARGET_NAME] `, replacing [TARGET_NAME] with `client` or `requests`.
 
 ## Using Dracord
 
