@@ -55,7 +55,7 @@ To install the Dracord, follow these steps:
 5. Run ` cmake -S .. -B . ` 
 > [!IMPORTANT]
 > If you're using vcpkg you will need to specify the path to vcpkg.cmake using `-DCMAKE_TOOLCHAIN_FILE=` <br>
-> To find vcpkg.make it is normally under your vcpkg path file. And example: `C:\User\[NAME]\vcpkg\scripts\buildsystems\`
+> To find vcpkg.make it is normally under your vcpkg path file. And example <br> `C:\User\[NAME]\vcpkg\scripts\buildsystems\`
 6. Run ` cmake --build . `
 > [!IMPORTANT]
 > You may also specify certain targets that I had created for testing purposes. Those being client and requests <br>
