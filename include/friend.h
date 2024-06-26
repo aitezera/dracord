@@ -2,6 +2,9 @@
 
 #include <string>
 #include <iostream>
+#include <cpr/cpr.h>
+#include <json/json.h>
+#include <map>
 #include <vector>
 
 class Friend {
@@ -16,13 +19,13 @@ class Friend {
                 dnd
         };
 
-        Friend(long id, std::string username, std::string avatar, std::string banner, std::string bio, Status status) {
+        Friend(long id, std::string username, std::string avatar, std::string banner, std::string bio, int status) {
             this->f_id = id;
             this->f_username = username;
             this->f_avatar = avatar;
             this->f_banner = banner;
             this->f_bio = bio;
-            this->f_status = status;
+            this->f_status = static_cast<Status>(status);
         }
 
         long f_id;
@@ -32,11 +35,11 @@ class Friend {
         std::string f_bio; // This might be removed later on >> Keeping for now
         Status f_status;
 
-    private:
         void edit_friend();
         void delete_friend();
         void add_friend();
         void block_friend();
         void unblock_friend();
         void view_friend();
+        void send_message(long channel_id, std::string message);
 };

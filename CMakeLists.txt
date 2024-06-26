@@ -70,7 +70,7 @@ target_link_libraries(client
 )
 
 # Custom target for requests
-add_executable(requests ${SRC_DIR}/requests.cpp ${SRC_DIR}/logging.cpp)
+add_executable(requests ${SRC_DIR}/requests.cpp ${SRC_DIR}/logging.cpp ${SRC_DIR}/friend.cpp)
 
 target_link_libraries(requests
     ZLIB::ZLIB

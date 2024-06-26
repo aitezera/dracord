@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <map>
 #include <vector>
 
 #include "guild.h"
@@ -28,4 +29,5 @@ class Channel : Guild {
         void view_channel();
         void edit_channel();
         void delete_channel();
+        void send_message(long channel_id, std::string message);
 };

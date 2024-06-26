@@ -22,7 +22,6 @@ void Log::setLevel(Level level)
     m_LogLevel = level;
 }
 
-
 std::string Log::getDate()
 {
     auto now = std::chrono::system_clock::now();
@@ -41,13 +40,12 @@ void Log::setFile(const char* fileName)
         m_File = nullptr;
     }
 
-    fopen_s(&m_File, fileName, "r");
+    m_File = fopen(fileName, "r");
     if (m_File == nullptr)
     {
-        Log::Error(("Error opening file: " + std::string(fileName) + " will create file and use it.").c_str());
+        Log::Error(("Error opening file: " + std::string(fileName) + " creating file and using file").c_str());
         std::ofstream { fileName }; // Create file
         Log::Info(("Created file: " + std::string(fileName)).c_str());
-        Log::Info(("Now using file: " + std::string(fileName)).c_str());
     }
     else {
         Log::Info(("Opened file: " + std::string(fileName)).c_str());
@@ -56,7 +54,7 @@ void Log::setFile(const char* fileName)
     if (m_File != nullptr)
         fclose(m_File); // Close read mode file
 
-    fopen_s(&m_File, fileName, "a");
+    m_File = fopen(fileName, "a");
 }
 
 void Log::Warn(const char* message) {

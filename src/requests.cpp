@@ -6,6 +6,7 @@
         - Cache the information from the API (friends, guilds, channels, messages)
         - Move onto the SDL2 client and have the requests be used in the client (for the GUI and other things)
 */
+
 // This needs to be here for now until I link it with the main file
 Log* logger = Log::getInstance();
 
@@ -19,9 +20,6 @@ int Requests::login_user() {
         load_token();
     }
 
-    logger->Info("[!] Updating Headers to include the token");
-    updateHeaders();
-
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + r_base_api + "users/@me").c_str());
 
@@ -32,12 +30,31 @@ int Requests::login_user() {
 
     logger->Info(("Response: " + std::string(response.text)).c_str());
 
-    //load_friends();
-    //load_guilds();
-    //load_channels();
-    //load_messages();
+    logger->Info("[!] Token was valid, updating headers");
+    updateHeaders();
 
     logger->Info("[!] User logged in successfully!");
+
+    load_friends();
+    load_guilds();
+    load_channels();
+    load_messages();
+
+    string idd = "";
+    string msg = "";
+    std::cout << "Enter the ID of the friend you want to message: ";
+    std::cin >> idd;
+
+    if (r_friends.find(idd) == r_friends.end()) {
+        logger->Error("Friend not found!");
+        return 1;
+    }
+
+    std::cout << "Enter the message you want to send: ";
+    std::cin >> msg;
+
+    Friend friendObj = r_friends[idd];
+    friendObj.send_message(std::stol(idd), msg);
 
     if (!std::ifstream(r_filename).good()) {
         logger->Info("[!] Saving Token for future use");
@@ -60,7 +77,17 @@ void Requests::load_friends() {
 
     logger->Info(("Response: " + std::string(response.text)).c_str()); 
 
-    // TODO: Cache it or something
+    Json::Value json;
+    for (const auto& friends : json) {
+        Friend friendObj(friends["id"].asInt64(), friends["username"].asString(),
+                         friends["avatar"].asString(), friends["banner"].asString(),
+                         friends["bio"].asString(), friends["status"].asInt());
+        
+        r_friends[friends["id"].asString()] = friendObj;
+    }
+
+    logger->Info("[!] Friends have been cached");
+    logger->Info("[!] Friends loaded successfully");
 }
 
 void Requests::load_guilds() {
@@ -75,8 +102,18 @@ void Requests::load_guilds() {
     }
 
     logger->Info(("Response: " + std::string(response.text)).c_str());
+    
+    Json::Value json;
+    for (const auto& guild : json) {
+        Guild guildObj(guild["id"].asInt64(), guild["owner_id"].asInt64(),
+                       guild["name"].asString(), guild["icon"].asString(),
+                       guild["banner"].asString());
+        
+        r_guilds[guild["id"].asString()] = guildObj;
+    }
 
-    // TODO: Cache it or something    
+    logger->Info("[!] Guilds have been cached");
+    logger->Info("[!] Guilds loaded successfully");
 }
 
 void Requests::load_channels() {
@@ -92,7 +129,17 @@ void Requests::load_channels() {
 
     logger->Info(("Response: " + std::string(response.text)).c_str());
 
-    // TODO: Cache it or something
+    
+    Json::Value json;
+    for (const auto& channel : json ) {
+        Channel channelObj(channel["id"].asInt64(), channel["name"].asString(),
+                           channel["topic"].asString(), channel["nsfw"].asBool());
+        
+        r_channels[channel["id"].asString()] = channelObj;
+    }
+
+    logger->Info("[!] Channels have been cached");
+    logger->Info("[!] Channels loaded successfully");
 }
 
 void Requests::load_messages() {
@@ -107,55 +154,10 @@ void Requests::load_messages() {
         return;
     }
     
-
     logger->Info(("Response: " + std::string(response.text)).c_str());
 
     // TODO: Cache it or something
 }
-
-void Requests::send_server_message(long channel_id, string message) {
-    logger->Info("[!] Sending Server Message");
-
-    Json::Value json;
-    json["content"] = message;
-    json["tts"] = false;
-
-    Json::StreamWriterBuilder builder;
-    std::string json_string = Json::writeString(builder, json);
-
-    cpr::Response response = cpr::Post(cpr::Url{r_base_api + "channels/" + std::to_string(channel_id) + "/messages"}, cpr::Body{json_string}, r_headers=r_headers);
-    logger->Info(("Using POST response with URL: " + r_base_api + "channels/" + std::to_string(channel_id) + "/messages").c_str());
-
-    if (response.status_code != 200) {
-        handle_status_code(response.status_code);
-        return;
-    }
-
-    logger->Info(("Response: " + std::string(response.text)).c_str());
-}
-
-
-void Requests::send_friend_message(long channel_id, string message) {
-    logger->Info("[!] Sending Friend Message");
-
-    Json::Value json;
-    json["content"] = message;
-    json["tts"] = false;
-
-    Json::StreamWriterBuilder builder;
-    std::string json_string = Json::writeString(builder, json);
-
-    cpr::Response response = cpr::Post(cpr::Url{r_base_api + "channels/" + std::to_string(channel_id) + "/messages"}, cpr::Body{json_string}, r_headers=r_headers);
-    logger->Info(("Using POST response with URL: " + r_base_api + "channels/" + std::to_string(channel_id) + "/messages").c_str());
-
-    if (response.status_code != 200) {
-        handle_status_code(response.status_code);
-        return;
-    }
-
-    logger->Info(("Response: " + std::string(response.text)).c_str());
-}
-
 
 void Requests::handle_status_code(int status_code) {
     switch (status_code) {
@@ -223,14 +225,16 @@ void Requests::load_token() {
     }
 }
 
+cpr::Header Requests::getHeaders() {
+    return r_headers;
+}
+
 // Comment this out for make all
-/*int main() {
+int main() {
     // This is here for testing purposes only
     // Main will be removed from this once I have the requests finished
-
-    string token = ""; // Set empty so that token grabs from file
     logger->setFile("requests.log");
 
-    Requests requests(token);
+    Requests requests;
     return requests.login_user();
-}*/
+}
