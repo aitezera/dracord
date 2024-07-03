@@ -11,7 +11,6 @@ void Messages::send_message(std::string message, std::vector<std::string> attach
 
 void Messages::send_message(std::string message, std::vector<std::string> attachments, std::vector<std::string> mentions, std::string tts) {};
 
-
 void Messages::reply_message() {};
 
 void Messages::edit_message() {};

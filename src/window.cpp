@@ -99,7 +99,7 @@ int Window::createWindow(const char* windowName)
 
 int Window::loopWindow()
 {
-    logger->Info("Looping SDL2 Window");
+    logger->Info("Looping Window");
 
     while (running)
     {
@@ -130,7 +130,7 @@ int Window::loopWindow()
         SDL_RenderFillRect(renderer, &chat_window);
 
         // Render text to screen
-        render_text(renderer, "I love SDL2", { 255, 255, 255, 255 }, 10, 10, w_font);
+        render_text(renderer, "I love latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
     }

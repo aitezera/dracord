@@ -46,7 +46,7 @@ Before you begin, ensure you have met the following requirements:
 
 ## Installing Dracord
 
-To install the Dracord, follow these steps:
+To install the Dracord, follow these steps: 
 
 1. Clone the repository
 2. Navigate to the project directory

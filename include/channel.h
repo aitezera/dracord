@@ -4,7 +4,6 @@
 #include <iostream>
 #include <map>
 #include <vector>
-
 #include "guild.h"
 
 class Channel : Guild {
@@ -25,7 +24,6 @@ class Channel : Guild {
         bool c_nsfw;
 
         // TODO: Add permissions later on
-        
         void view_channel();
         void edit_channel();
         void delete_channel();

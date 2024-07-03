@@ -41,6 +41,15 @@ class Requests {
         string r_token;
         string r_filename = "token.bin";
 
+        cpr::Header r_headers = {
+            {"Content-Type", "application/json"},
+            {"Authorization", r_token}
+        };
+
+        void updateHeaders() {
+            r_headers["Authorization"] = r_token; // Set Headers upon receiving token.
+        }
+
         // Read and write token to file
         void save_token();
         void load_token();
@@ -50,14 +59,5 @@ class Requests {
         void load_guilds();
         void load_channels();
         void load_messages();
-        void handle_status_code(int r_status_code);
-
-        cpr::Header r_headers = {
-            {"Content-Type", "application/json"},
-            {"Authorization", r_token}
-        };
-        
-        void updateHeaders() {
-            r_headers["Authorization"] = r_token; // Set Headers upon receiving token. Otherwise this will be empty and fail
-        }
+        void handle_status_code(int r_status_code, string r_error);
 };

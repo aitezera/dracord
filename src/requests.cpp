@@ -11,42 +11,45 @@
 Log* logger = Log::getInstance();
 
 int Requests::login_user() {
-    logger->Info("[!] Attempting logging user in with Discord API");
-    
+
     if (r_token.empty() && !std::ifstream(r_filename).good()) {
-        handle_status_code(401);
+        handle_status_code(401, "");
         return 1;
-    } else {
+
+    } else if (std::ifstream(r_filename).good()) {
+        logger->Info("[!] Loading token from file");
         load_token();
     }
 
-    cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me"}, r_headers=r_headers);
-    logger->Info(("Using GET response with URL: " + r_base_api + "users/@me").c_str());
+    logger->Info("[!] Updating Headers");
+    updateHeaders();
+
+    logger->Info("[!] Headers have been updated");
+    logger->Info("[!] Attempting to login user with Discord API");
+
+    cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me"}, r_headers);
+    logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
-        handle_status_code(response.status_code);
+        handle_status_code(response.status_code, response.error.message);
         return 1;
     }
 
     logger->Info(("Response: " + std::string(response.text)).c_str());
-
-    logger->Info("[!] Token was valid, updating headers");
-    updateHeaders();
-
     logger->Info("[!] User logged in successfully!");
 
     load_friends();
-    load_guilds();
+    //load_guilds();
     load_channels();
-    load_messages();
+    //load_messages();
 
-    string idd = "";
-    string msg = "";
+    string idd;
+    string msg;
     std::cout << "Enter the ID of the friend you want to message: ";
     std::cin >> idd;
 
-    if (r_friends.find(idd) == r_friends.end()) {
-        logger->Error("Friend not found!");
+    if (r_channels.find(idd) == r_channels.end()) {
+        logger->Error("Could not find Friends channel ID!");
         return 1;
     }
 
@@ -68,10 +71,10 @@ void Requests::load_friends() {
     logger->Info("[!] Loading Friends");
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/relationships"}, r_headers=r_headers);
-    logger->Info(("Using GET response with URL: " + r_base_api + "users/@me/relationships").c_str());
+    logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
-        handle_status_code(response.status_code);
+        handle_status_code(response.status_code, response.error.message);
         return;
     }
 
@@ -84,20 +87,20 @@ void Requests::load_friends() {
                          friends["bio"].asString(), friends["status"].asInt());
         
         r_friends[friends["id"].asString()] = friendObj;
+        std::cout << friends["id"].asString() << std::endl;        
     }
 
-    logger->Info("[!] Friends have been cached");
-    logger->Info("[!] Friends loaded successfully");
+    logger->Info("[!] Friends have been loaded and cached");
 }
 
 void Requests::load_guilds() {
     logger->Info("[!] Loading Guilds");
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/guilds"}, r_headers=r_headers);
-    logger->Info(("Using GET response with URL: " + r_base_api + "users/@me/guilds").c_str());
+    logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
-        handle_status_code(response.status_code);
+        handle_status_code(response.status_code, response.error.message);
         return;
     }
 
@@ -120,22 +123,22 @@ void Requests::load_channels() {
     logger->Info("[!] Loading Channels");
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/channels"}, r_headers=r_headers);
-    logger->Info(("Using GET response with URL: " + r_base_api + "users/@me/channels").c_str());
+    logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
-        handle_status_code(response.status_code);
+        handle_status_code(response.status_code, response.error.message);
         return;
     }
 
     logger->Info(("Response: " + std::string(response.text)).c_str());
 
-    
     Json::Value json;
     for (const auto& channel : json ) {
         Channel channelObj(channel["id"].asInt64(), channel["name"].asString(),
                            channel["topic"].asString(), channel["nsfw"].asBool());
         
-        r_channels[channel["id"].asString()] = channelObj;
+        r_channels[channel["recipents"]["id"].asString()] = channelObj;
+        std::cout << channel["recipents"]["id"].asString() << std::endl;
     }
 
     logger->Info("[!] Channels have been cached");
@@ -147,10 +150,10 @@ void Requests::load_messages() {
     
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/channels"}, r_headers=r_headers);
-    logger->Info(("Using GET response with URL: " + r_base_api + "users/@me/channels").c_str());
+    logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
-        handle_status_code(response.status_code);
+        handle_status_code(response.status_code, response.error.message);
         return;
     }
     
@@ -159,7 +162,7 @@ void Requests::load_messages() {
     // TODO: Cache it or something
 }
 
-void Requests::handle_status_code(int status_code) {
+void Requests::handle_status_code(int status_code, std::string message = "") {
     switch (status_code) {
         case 400:
             logger->Error("Bad Request!");
@@ -180,7 +183,7 @@ void Requests::handle_status_code(int status_code) {
             logger->Error("Bad Gateway! The server was acting as a gateway or proxy and received an invalid response from the upstream server.");
             break;
         default:
-            logger->Error(("Error! Status code: " + std::to_string(status_code)).c_str());
+            logger->Error(("Error!: " + message).c_str());
             break;
     }
 }
@@ -233,8 +236,17 @@ cpr::Header Requests::getHeaders() {
 int main() {
     // This is here for testing purposes only
     // Main will be removed from this once I have the requests finished
+    std::string token = "";
+    std::string fakeString;
+    std::cout << "Enter your Discord token: ";
+    std::cin >> token;
     logger->setFile("requests.log");
 
-    Requests requests;
-    return requests.login_user();
+    Requests requests(token);
+    requests.login_user();
+    
+    std::cout << "Press any key to exit...";
+    std::cin >> fakeString;
+
+    return 0;
 }
