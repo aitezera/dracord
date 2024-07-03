@@ -7,26 +7,34 @@
         - Move onto the SDL2 client and have the requests be used in the client (for the GUI and other things)
 */
 
+/*
+    This is the main file for the requests. This will handle all the requests to the Discord API.
+    This will also handle the caching of the information from the API.
+
+    
+    I will most likely move to Websockets for messages and such, so this will only really act like a first time prompt to load information
+    from the API, or whenever the user launches the application. Though will need to add a way to refresh the cache if the user wants to.
+
+*/
+
 // This needs to be here for now until I link it with the main file
 Log* logger = Log::getInstance();
 
 int Requests::login_user() {
 
     if (r_token.empty() && !std::ifstream(r_filename).good()) {
-        handle_status_code(401, "");
+        handle_status_code(401, "Token was Empty and no token file was found!");
         return 1;
 
     } else if (std::ifstream(r_filename).good()) {
-        logger->Info("[!] Loading token from file");
+        logger->Info("Loading token from file");
         load_token();
     }
 
-    logger->Info("[!] Updating Headers");
+    logger->Info("Updating Headers to include Token");
     updateHeaders();
 
-    logger->Info("[!] Headers have been updated");
-    logger->Info("[!] Attempting to login user with Discord API");
-
+    logger->Info("Attempting to login user with Discord API");
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me"}, r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
@@ -35,40 +43,108 @@ int Requests::login_user() {
         return 1;
     }
 
-    logger->Info(("Response: " + std::string(response.text)).c_str());
-    logger->Info("[!] User logged in successfully!");
-
-    load_friends();
-    //load_guilds();
-    load_channels();
-    //load_messages();
-
-    string idd;
-    string msg;
-    std::cout << "Enter the ID of the friend you want to message: ";
-    std::cin >> idd;
-
-    if (r_channels.find(idd) == r_channels.end()) {
-        logger->Error("Could not find Friends channel ID!");
-        return 1;
-    }
-
-    std::cout << "Enter the message you want to send: ";
-    std::cin >> msg;
-
-    Friend friendObj = r_friends[idd];
-    friendObj.send_message(std::stol(idd), msg);
+    logger->Info(("Response: " + std::string(response.text)).c_str()); // Remove this once I know what I need to do with the response
+    logger->Info("User logged in successfully!");
 
     if (!std::ifstream(r_filename).good()) {
-        logger->Info("[!] Saving Token for future use");
         save_token();
     }
+
+    logger->Info("Attemping to set up cache folders");
+    setup_cache();
+
+    logger->Info("Loading Friends from the Discord API");
+    // Load Friends
+    logger->Info("Loading Guilds from the Discord API");
+    // Load Guilds
+    logger->Info("Loading Channels from the Discord API");
+    // Load Channels
+    logger->Info("Loading Messages from the Discord API");
+    // Load Messages || Leave this to Websockets?
+
+
+    write_cache("friends", "test", response.text);
+    read_cache("friends", "test");
 
     return 0;
 }
 
+void Requests::setup_cache() {
+
+    if (!std::filesystem::exists("cache")) {
+        logger->Info("Creating folder for cache");
+        std::filesystem::create_directory("cache");
+    } else {
+        logger->Info("Cache folder already exists");
+    }
+
+    if (!std::filesystem::exists("cache/friends")) {
+        logger->Info("Creating folder for friends cache");
+        std::filesystem::create_directory("cache/friends");
+    } else {
+        logger->Info("Friends cache folder already exists");
+    }
+
+    if (!std::filesystem::exists("cache/guilds")) {
+        logger->Info("Creating folder for guilds cache");
+        std::filesystem::create_directory("cache/guilds");
+    } else {
+        logger->Info("Guilds cache folder already exists");
+    }
+
+    if (!std::filesystem::exists("cache/channels")) {
+        logger->Info("Creating folder for channels cache");
+        std::filesystem::create_directory("cache/channels");
+    } else {
+        logger->Info("Channels cache folder already exists");
+    }
+
+    if (!std::filesystem::exists("cache/messages")) {
+        logger->Info("Creating folder for messages cache");
+        std::filesystem::create_directory("cache/messages");
+    } else {
+        logger->Info("Messages cache folder already exists");
+    }
+}
+
+void Requests::read_cache(std::string subdir, std::string file_name) {
+    if (!std::filesystem::exists("cache/" + subdir + "/" + file_name + ".json")) {
+        logger->Error(("Cache file doesn't exist: " + subdir + "/" + file_name + ".json").c_str());
+        return;
+    }
+
+    Json::Value json;
+    std::ifstream in("cache/" + subdir + "/" + file_name + ".json");
+    in >> json;
+    in.close();
+
+    if (json.isObject()) {
+        for (const auto& key : json.getMemberNames()) {
+            logger->Info(("Key: " + key).c_str());
+        }
+    } else {
+        logger->Error("Cache file is not a JSON object");
+        return;
+    }
+
+    logger->Info("Cache file read successfully");
+}
+
+void Requests::write_cache(std::string subdir, std::string file_name, const Json::Value& data) {    
+    Json::StreamWriterBuilder writer;
+    writer["indentation"] = "\t";
+    std::unique_ptr<Json::StreamWriter> jsonWriter(writer.newStreamWriter());
+    
+    std::ofstream out("cache/" + subdir + "/" + file_name + ".json");
+    jsonWriter->write(data, &out);
+    out.close();
+
+    logger->Info("Cache file written successfully");
+}
+
+
 void Requests::load_friends() {
-    logger->Info("[!] Loading Friends");
+    logger->Info("Loading Friends");
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/relationships"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
@@ -90,11 +166,10 @@ void Requests::load_friends() {
         std::cout << friends["id"].asString() << std::endl;        
     }
 
-    logger->Info("[!] Friends have been loaded and cached");
 }
 
 void Requests::load_guilds() {
-    logger->Info("[!] Loading Guilds");
+    logger->Info("Loading Guilds");
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/guilds"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
@@ -115,12 +190,12 @@ void Requests::load_guilds() {
         r_guilds[guild["id"].asString()] = guildObj;
     }
 
-    logger->Info("[!] Guilds have been cached");
-    logger->Info("[!] Guilds loaded successfully");
+    logger->Info("Guilds have been cached");
+    logger->Info("Guilds loaded successfully");
 }
 
 void Requests::load_channels() {
-    logger->Info("[!] Loading Channels");
+    logger->Info("Loading Channels");
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/channels"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
@@ -138,15 +213,14 @@ void Requests::load_channels() {
                            channel["topic"].asString(), channel["nsfw"].asBool());
         
         r_channels[channel["recipents"]["id"].asString()] = channelObj;
-        std::cout << channel["recipents"]["id"].asString() << std::endl;
     }
 
-    logger->Info("[!] Channels have been cached");
-    logger->Info("[!] Channels loaded successfully");
+    logger->Info("Channels have been cached");
+    logger->Info("Channels loaded successfully");
 }
 
 void Requests::load_messages() {
-    logger->Info("[!] Loading Messages");
+    logger->Info("Loading Messages");
     
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/channels"}, r_headers=r_headers);
@@ -189,7 +263,7 @@ void Requests::handle_status_code(int status_code, std::string message = "") {
 }
 
 void Requests::save_token() {
-    logger->Info(("[!] Saving Token at: " + r_filename).c_str());
+    logger->Info(("Saving Token at: " + r_filename).c_str());
     std::ofstream out(r_filename, std::ios::binary);
     if (out.is_open()) {
         std::string encrypt_token = r_token;
@@ -237,16 +311,10 @@ int main() {
     // This is here for testing purposes only
     // Main will be removed from this once I have the requests finished
     std::string token = "";
-    std::string fakeString;
-    std::cout << "Enter your Discord token: ";
-    std::cin >> token;
-    logger->setFile("requests.log");
+    //logger->setFile("requests.log");
 
     Requests requests(token);
     requests.login_user();
-    
-    std::cout << "Press any key to exit...";
-    std::cin >> fakeString;
 
     return 0;
 }

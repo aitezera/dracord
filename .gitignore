@@ -11,8 +11,9 @@ nul
 *.txt
 .vscode
 
-# Ignore build
+# Ignore folders
 build/
+cache/
 
 # Ignore environment variables
 .env

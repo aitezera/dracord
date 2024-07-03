@@ -6,6 +6,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <filesystem>
 
 #include "friend.h"
 #include "guild.h"
@@ -60,4 +61,7 @@ class Requests {
         void load_channels();
         void load_messages();
         void handle_status_code(int r_status_code, string r_error);
+        void setup_cache();
+        void read_cache(std::string subdir, std::string file_name);
+        void write_cache(std::string subdir, std::string file_name, const Json::Value& data);
 };
