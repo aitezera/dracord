@@ -7,6 +7,7 @@
 #include <map>
 #include <vector>
 #include <filesystem>
+#include <memory>
 
 #include "friend.h"
 #include "guild.h"
@@ -36,7 +37,7 @@ class Requests {
         }
 
         cpr::Header getHeaders();
-        int login_user();
+        int loginUser();
 
     private:
         string r_token;
@@ -52,16 +53,19 @@ class Requests {
         }
 
         // Read and write token to file
-        void save_token();
-        void load_token();
+        void saveToken();
+        void loadToken();
     
         // API Requests
-        void load_friends();
-        void load_guilds();
-        void load_channels();
-        void load_messages();
-        void handle_status_code(int r_status_code, string r_error);
-        void setup_cache();
-        void read_cache(std::string subdir, std::string file_name);
-        void write_cache(std::string subdir, std::string file_name, const Json::Value& data);
+        void loadFriends();
+        void loadGuilds();
+        void loadChannels();
+        void loadMessages();
+        void handleStatusCode(int r_status_code, string r_error);
+
+        // Cache related functions
+        void setupCache();
+        void readCache(std::string subdir, std::string file_name);
+        void writeCache(std::string subdir, std::string file_name, const Json::Value& data);
+        Json::Value parseToJson(const std::string& jsonString);
 };

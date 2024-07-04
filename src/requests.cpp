@@ -20,15 +20,15 @@
 // This needs to be here for now until I link it with the main file
 Log* logger = Log::getInstance();
 
-int Requests::login_user() {
+int Requests::loginUser() {
 
     if (r_token.empty() && !std::ifstream(r_filename).good()) {
-        handle_status_code(401, "Token was Empty and no token file was found!");
+        handleStatusCode(401, "Token was Empty and no token file was found!");
         return 1;
 
     } else if (std::ifstream(r_filename).good()) {
         logger->Info("Loading token from file");
-        load_token();
+        loadToken();
     }
 
     logger->Info("Updating Headers to include Token");
@@ -39,7 +39,7 @@ int Requests::login_user() {
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
-        handle_status_code(response.status_code, response.error.message);
+        handleStatusCode(response.status_code, response.error.message);
         return 1;
     }
 
@@ -47,11 +47,11 @@ int Requests::login_user() {
     logger->Info("User logged in successfully!");
 
     if (!std::ifstream(r_filename).good()) {
-        save_token();
+        saveToken();
     }
 
     logger->Info("Attemping to set up cache folders");
-    setup_cache();
+    setupCache();
 
     logger->Info("Loading Friends from the Discord API");
     // Load Friends
@@ -62,79 +62,82 @@ int Requests::login_user() {
     logger->Info("Loading Messages from the Discord API");
     // Load Messages || Leave this to Websockets?
 
-
-    write_cache("friends", "test", response.text);
-    read_cache("friends", "test");
+    Json::Value test;
+    test = parseToJson(response.text);
+    writeCache("friends", "test", test);
+    readCache("friends", "test");
 
     return 0;
 }
 
-void Requests::setup_cache() {
+void Requests::setupCache() {
 
     if (!std::filesystem::exists("cache")) {
         logger->Info("Creating folder for cache");
         std::filesystem::create_directory("cache");
-    } else {
-        logger->Info("Cache folder already exists");
     }
 
     if (!std::filesystem::exists("cache/friends")) {
         logger->Info("Creating folder for friends cache");
         std::filesystem::create_directory("cache/friends");
-    } else {
-        logger->Info("Friends cache folder already exists");
     }
 
     if (!std::filesystem::exists("cache/guilds")) {
         logger->Info("Creating folder for guilds cache");
         std::filesystem::create_directory("cache/guilds");
-    } else {
-        logger->Info("Guilds cache folder already exists");
     }
 
     if (!std::filesystem::exists("cache/channels")) {
         logger->Info("Creating folder for channels cache");
         std::filesystem::create_directory("cache/channels");
-    } else {
-        logger->Info("Channels cache folder already exists");
     }
 
     if (!std::filesystem::exists("cache/messages")) {
         logger->Info("Creating folder for messages cache");
         std::filesystem::create_directory("cache/messages");
-    } else {
-        logger->Info("Messages cache folder already exists");
     }
 }
 
-void Requests::read_cache(std::string subdir, std::string file_name) {
+void Requests::readCache(std::string subdir, std::string file_name) {
     if (!std::filesystem::exists("cache/" + subdir + "/" + file_name + ".json")) {
         logger->Error(("Cache file doesn't exist: " + subdir + "/" + file_name + ".json").c_str());
         return;
     }
+    
+    logger->Info(("Reading cache file: " + subdir + "/" + file_name + ".json").c_str());
 
-    Json::Value json;
+    Json::Value jsonRead;
     std::ifstream in("cache/" + subdir + "/" + file_name + ".json");
-    in >> json;
+    in >> jsonRead;
     in.close();
 
-    if (json.isObject()) {
-        for (const auto& key : json.getMemberNames()) {
-            logger->Info(("Key: " + key).c_str());
-        }
+    if (!jsonRead.isObject()) {
+        logger->Error("Failed to parse cache file to JSON object");
+        return;
+    }
+
+    if (jsonRead.isMember("id")) {
+        logger->Info(("ID: " + jsonRead["id"].asString()).c_str());
+        logger->Info(("Username: " + jsonRead["username"].asString()).c_str());
+        logger->Info(("Discriminator: " + jsonRead["discriminator"].asString()).c_str());
+        logger->Info(("Avatar: " + jsonRead["avatar"].asString()).c_str());
+        logger->Info(("Global name: " + jsonRead["global_name"].asString()).c_str());
+        logger->Info(("Bio: " + jsonRead["bio"].asString()).c_str());
     } else {
-        logger->Error("Cache file is not a JSON object");
+        logger->Error("Failed to read cache file");
         return;
     }
 
     logger->Info("Cache file read successfully");
 }
 
-void Requests::write_cache(std::string subdir, std::string file_name, const Json::Value& data) {    
+void Requests::writeCache(std::string subdir, std::string file_name, const Json::Value& data) {    
     Json::StreamWriterBuilder writer;
     writer["indentation"] = "\t";
     std::unique_ptr<Json::StreamWriter> jsonWriter(writer.newStreamWriter());
     
+    logger->Info(("Writing cache file: " + subdir + "/" + file_name + ".json").c_str());
+
     std::ofstream out("cache/" + subdir + "/" + file_name + ".json");
     jsonWriter->write(data, &out);
     out.close();
@@ -142,101 +145,78 @@ void Requests::write_cache(std::string subdir, std::string file_name, const Json
     logger->Info("Cache file written successfully");
 }
 
+Json::Value Requests::parseToJson(const std::string& jsonString) {
+    Json::Value root;
+    std::string errs;
+    Json::CharReaderBuilder builder;
+    const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
 
-void Requests::load_friends() {
+    if (!reader->parse(jsonString.c_str(), jsonString.c_str() + jsonString.length(), &root, &errs)) {
+        throw std::runtime_error("Failed to parse JSON: " + errs);
+    }
+
+    return root;
+}
+
+
+void Requests::loadFriends() {
     logger->Info("Loading Friends");
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/relationships"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
-        handle_status_code(response.status_code, response.error.message);
+        handleStatusCode(response.status_code, response.error.message);
         return;
     }
 
     logger->Info(("Response: " + std::string(response.text)).c_str()); 
 
-    Json::Value json;
-    for (const auto& friends : json) {
-        Friend friendObj(friends["id"].asInt64(), friends["username"].asString(),
-                         friends["avatar"].asString(), friends["banner"].asString(),
-                         friends["bio"].asString(), friends["status"].asInt());
-        
-        r_friends[friends["id"].asString()] = friendObj;
-        std::cout << friends["id"].asString() << std::endl;        
-    }
-
 }
 
-void Requests::load_guilds() {
+void Requests::loadGuilds() {
     logger->Info("Loading Guilds");
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/guilds"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
-        handle_status_code(response.status_code, response.error.message);
+        handleStatusCode(response.status_code, response.error.message);
         return;
     }
 
     logger->Info(("Response: " + std::string(response.text)).c_str());
-    
-    Json::Value json;
-    for (const auto& guild : json) {
-        Guild guildObj(guild["id"].asInt64(), guild["owner_id"].asInt64(),
-                       guild["name"].asString(), guild["icon"].asString(),
-                       guild["banner"].asString());
-        
-        r_guilds[guild["id"].asString()] = guildObj;
-    }
-
-    logger->Info("Guilds have been cached");
-    logger->Info("Guilds loaded successfully");
 }
 
-void Requests::load_channels() {
+void Requests::loadChannels() {
     logger->Info("Loading Channels");
 
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/channels"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
-        handle_status_code(response.status_code, response.error.message);
+        handleStatusCode(response.status_code, response.error.message);
         return;
     }
 
     logger->Info(("Response: " + std::string(response.text)).c_str());
-
-    Json::Value json;
-    for (const auto& channel : json ) {
-        Channel channelObj(channel["id"].asInt64(), channel["name"].asString(),
-                           channel["topic"].asString(), channel["nsfw"].asBool());
-        
-        r_channels[channel["recipents"]["id"].asString()] = channelObj;
-    }
-
-    logger->Info("Channels have been cached");
-    logger->Info("Channels loaded successfully");
 }
 
-void Requests::load_messages() {
+void Requests::loadMessages() {
     logger->Info("Loading Messages");
     
-
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/channels"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
-        handle_status_code(response.status_code, response.error.message);
+        handleStatusCode(response.status_code, response.error.message);
         return;
     }
     
     logger->Info(("Response: " + std::string(response.text)).c_str());
-
-    // TODO: Cache it or something
 }
 
-void Requests::handle_status_code(int status_code, std::string message = "") {
+void Requests::handleStatusCode(int status_code, std::string message = "") {
     switch (status_code) {
         case 400:
             logger->Error("Bad Request!");
@@ -262,7 +242,7 @@ void Requests::handle_status_code(int status_code, std::string message = "") {
     }
 }
 
-void Requests::save_token() {
+void Requests::saveToken() {
     logger->Info(("Saving Token at: " + r_filename).c_str());
     std::ofstream out(r_filename, std::ios::binary);
     if (out.is_open()) {
@@ -279,7 +259,7 @@ void Requests::save_token() {
     }
 }
 
-void Requests::load_token() {
+void Requests::loadToken() {
     logger->Info(("Loading token from file: " + r_filename).c_str());
     std::ifstream in(r_filename, std::ios::binary | std::ios::ate);
     if (in.is_open()) {
@@ -314,7 +294,7 @@ int main() {
     //logger->setFile("requests.log");
 
     Requests requests(token);
-    requests.login_user();
+    requests.loginUser();
 
     return 0;
 }
