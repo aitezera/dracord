@@ -1,21 +1,15 @@
 #pragma once
 
 #include <cpr/cpr.h>
-#include <iostream>
 #include <json/json.h>
 #include <string>
-#include <map>
-#include <vector>
 #include <filesystem>
-#include <memory>
 
 #include "friend.h"
 #include "guild.h"
 #include "channel.h"
 
 using std::string;
-using std::vector;
-using std::map;
 
 class Requests {
     public:
@@ -27,16 +21,10 @@ class Requests {
         string r_base_cdn = "https://cdn.discordapp.com/";
         string r_base_invite = "https://discord.gg/";
 
-        map<string, Friend> r_friends;
-        map<string, Guild> r_guilds;
-        map<string, Channel> r_channels;
-        //map<string, vector<Messages>> r_messages;
-
         Requests(string uToken) {
             r_token = uToken;  // Set token
         }
 
-        cpr::Header getHeaders();
         int loginUser();
 
     private:
@@ -49,7 +37,8 @@ class Requests {
         };
 
         void updateHeaders() {
-            r_headers["Authorization"] = r_token; // Set Headers upon receiving token.
+            // Set the Authorization header || IF we dont set it's empty
+            r_headers["Authorization"] = r_token;
         }
 
         // Read and write token to file

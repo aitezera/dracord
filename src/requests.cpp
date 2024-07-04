@@ -347,19 +347,12 @@ void Requests::loadToken() {
 //
 //_____________________________________________________________________________________________________________________________
 
-cpr::Header Requests::getHeaders() {
-    return r_headers;
-}
-
-//
-//_____________________________________________________________________________________________________________________________
 
 // Comment this out for make all
 int main() {
     // This is here for testing purposes only
     // Main will be removed from this once I have the requests finished
-    std::string token = "";
-    //logger->setFile("requests.log");
+    std::string token;
 
     Requests requests(token);
     requests.loginUser();
