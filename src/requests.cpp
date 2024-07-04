@@ -20,6 +20,9 @@
 // This needs to be here for now until I link it with the main file
 Log* logger = Log::getInstance();
 
+
+//
+//_____________________________________________________________________________________________________________________________
 int Requests::loginUser() {
 
     if (r_token.empty() && !std::ifstream(r_filename).good()) {
@@ -70,6 +73,9 @@ int Requests::loginUser() {
     return 0;
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
 void Requests::setupCache() {
 
     if (!std::filesystem::exists("cache")) {
@@ -98,6 +104,9 @@ void Requests::setupCache() {
     }
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
 void Requests::readCache(std::string subdir, std::string file_name) {
     if (!std::filesystem::exists("cache/" + subdir + "/" + file_name + ".json")) {
         logger->Error(("Cache file doesn't exist: " + subdir + "/" + file_name + ".json").c_str());
@@ -116,13 +125,43 @@ void Requests::readCache(std::string subdir, std::string file_name) {
         return;
     }
 
-    if (jsonRead.isMember("id")) {
-        logger->Info(("ID: " + jsonRead["id"].asString()).c_str());
-        logger->Info(("Username: " + jsonRead["username"].asString()).c_str());
-        logger->Info(("Discriminator: " + jsonRead["discriminator"].asString()).c_str());
-        logger->Info(("Avatar: " + jsonRead["avatar"].asString()).c_str());
-        logger->Info(("Global name: " + jsonRead["global_name"].asString()).c_str());
-        logger->Info(("Bio: " + jsonRead["bio"].asString()).c_str());
+    if (jsonRead.type() == 7)  { // Object Value = 7
+        for (const auto& key : jsonRead.getMemberNames()) {
+            const Json::Value& value = jsonRead[key];
+            std::string valueStr;
+
+            switch (value.type()) {
+                case 0: // Null
+                    valueStr = "null";
+                    break;
+                case 1: // Int
+                    valueStr = std::to_string(value.asInt());
+                    break;
+                case 2: // UInt
+                    valueStr = std::to_string(value.asUInt());
+                    break;
+                case 3: // Double
+                    valueStr = std::to_string(value.asDouble());
+                    break;
+                case 4: // String
+                    valueStr = value.asString();
+                    break;
+                case 5: // Boolean
+                    valueStr = value.asBool() ? "true" : "false";
+                    break;
+                case 6: // Array
+                    valueStr = "Array";
+                    break;
+                case 7: // Object
+                    valueStr = "Object";
+                    break;
+                default:
+                    valueStr = "Unknown";
+                    break;
+            }
+
+            logger->Info(("Key: " + key + " || Value: " + valueStr).c_str());
+        }
     } else {
         logger->Error("Failed to read cache file");
         return;
@@ -130,6 +169,9 @@ void Requests::readCache(std::string subdir, std::string file_name) {
 
     logger->Info("Cache file read successfully");
 }
+
+//
+//_____________________________________________________________________________________________________________________________
 
 void Requests::writeCache(std::string subdir, std::string file_name, const Json::Value& data) {    
     Json::StreamWriterBuilder writer;
@@ -158,6 +200,8 @@ Json::Value Requests::parseToJson(const std::string& jsonString) {
     return root;
 }
 
+//
+//_____________________________________________________________________________________________________________________________
 
 void Requests::loadFriends() {
     logger->Info("Loading Friends");
@@ -174,6 +218,9 @@ void Requests::loadFriends() {
 
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
 void Requests::loadGuilds() {
     logger->Info("Loading Guilds");
 
@@ -187,6 +234,9 @@ void Requests::loadGuilds() {
 
     logger->Info(("Response: " + std::string(response.text)).c_str());
 }
+
+//
+//_____________________________________________________________________________________________________________________________
 
 void Requests::loadChannels() {
     logger->Info("Loading Channels");
@@ -202,6 +252,9 @@ void Requests::loadChannels() {
     logger->Info(("Response: " + std::string(response.text)).c_str());
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
 void Requests::loadMessages() {
     logger->Info("Loading Messages");
     
@@ -215,6 +268,9 @@ void Requests::loadMessages() {
     
     logger->Info(("Response: " + std::string(response.text)).c_str());
 }
+
+//
+//_____________________________________________________________________________________________________________________________
 
 void Requests::handleStatusCode(int status_code, std::string message = "") {
     switch (status_code) {
@@ -242,6 +298,9 @@ void Requests::handleStatusCode(int status_code, std::string message = "") {
     }
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
 void Requests::saveToken() {
     logger->Info(("Saving Token at: " + r_filename).c_str());
     std::ofstream out(r_filename, std::ios::binary);
@@ -258,6 +317,9 @@ void Requests::saveToken() {
         out.close();
     }
 }
+
+//
+//_____________________________________________________________________________________________________________________________
 
 void Requests::loadToken() {
     logger->Info(("Loading token from file: " + r_filename).c_str());
@@ -282,9 +344,15 @@ void Requests::loadToken() {
     }
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
 cpr::Header Requests::getHeaders() {
     return r_headers;
 }
+
+//
+//_____________________________________________________________________________________________________________________________
 
 // Comment this out for make all
 int main() {
