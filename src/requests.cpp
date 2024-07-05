@@ -68,7 +68,7 @@ int Requests::loginUser() {
     Json::Value test;
     test = parseToJson(response.text);
     writeCache("friends", "test", test);
-    readCache("friends", "test");
+    readCache("friends", "test2");
 
     return 0;
 }
@@ -78,29 +78,29 @@ int Requests::loginUser() {
 
 void Requests::setupCache() {
 
-    if (!std::filesystem::exists("cache")) {
+    if (!fs::exists("cache")) {
         logger->Info("Creating folder for cache");
-        std::filesystem::create_directory("cache");
+        fs::create_directory("cache");
     }
 
-    if (!std::filesystem::exists("cache/friends")) {
+    if (!fs::exists("cache/friends")) {
         logger->Info("Creating folder for friends cache");
-        std::filesystem::create_directory("cache/friends");
+        fs::create_directory("cache/friends");
     }
 
-    if (!std::filesystem::exists("cache/guilds")) {
+    if (!fs::exists("cache/guilds")) {
         logger->Info("Creating folder for guilds cache");
-        std::filesystem::create_directory("cache/guilds");
+        fs::create_directory("cache/guilds");
     }
 
-    if (!std::filesystem::exists("cache/channels")) {
+    if (!fs::exists("cache/channels")) {
         logger->Info("Creating folder for channels cache");
-        std::filesystem::create_directory("cache/channels");
+        fs::create_directory("cache/channels");
     }
 
-    if (!std::filesystem::exists("cache/messages")) {
+    if (!fs::exists("cache/messages")) {
         logger->Info("Creating folder for messages cache");
-        std::filesystem::create_directory("cache/messages");
+        fs::create_directory("cache/messages");
     }
 }
 
@@ -108,8 +108,8 @@ void Requests::setupCache() {
 //_____________________________________________________________________________________________________________________________
 
 void Requests::readCache(std::string subdir, std::string file_name) {
-    if (!std::filesystem::exists("cache/" + subdir + "/" + file_name + ".json")) {
-        logger->Error(("Cache file doesn't exist: " + subdir + "/" + file_name + ".json").c_str());
+    if (!fs::exists("cache/" + subdir + "/" + file_name + ".json")) {
+        logger->Error(("Tried reading invalid cache file: " + subdir + "/" + file_name + ".json").c_str());
         return;
     }
     
@@ -194,6 +194,7 @@ Json::Value Requests::parseToJson(const std::string& jsonString) {
     const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
 
     if (!reader->parse(jsonString.c_str(), jsonString.c_str() + jsonString.length(), &root, &errs)) {
+        logger->Error(("Failed to parse JSON: " + errs).c_str());
         throw std::runtime_error("Failed to parse JSON: " + errs);
     }
 
@@ -215,7 +216,6 @@ void Requests::loadFriends() {
     }
 
     logger->Info(("Response: " + std::string(response.text)).c_str()); 
-
 }
 
 //
@@ -346,6 +346,30 @@ void Requests::loadToken() {
 
 //
 //_____________________________________________________________________________________________________________________________
+
+/*
+void Friend::send_message(long channel_id, std::string message) {
+    Requests req;
+    cpr::Header headers = req.getHeaders();
+    logger->Info("[!] Sending Friend Message");
+
+    Json::Value json;
+    json["content"] = message;
+    json["tts"] = false;
+
+    Json::StreamWriterBuilder builder;
+    std::string json_string = Json::writeString(builder, json);
+
+    cpr::Response response = cpr::Post(cpr::Url{req.r_base_api + "channels/" + std::to_string(channel_id) + "/messages"}, cpr::Body{json_string}, headers=headers);
+    logger->Info(("Using POST response with URL: " + req.r_base_api + "channels/" + std::to_string(channel_id) + "/messages").c_str());
+
+    if (response.status_code != 200) {
+        return;
+    }
+
+    logger->Info(("Response: " + std::string(response.text)).c_str());
+};
+*/
 
 
 // Comment this out for make all

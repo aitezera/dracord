@@ -5,12 +5,9 @@
 #include <string>
 #include <filesystem>
 
-#include "friend.h"
-#include "guild.h"
-#include "channel.h"
 
 using std::string;
-
+namespace fs = std::filesystem;
 class Requests {
     public:
         Requests() {}
@@ -25,6 +22,10 @@ class Requests {
             r_token = uToken;  // Set token
         }
 
+        cpr::Header getHeaders() {
+            return r_headers;
+        }
+        
         int loginUser();
 
     private:
@@ -54,6 +55,8 @@ class Requests {
 
         // Cache related functions
         void setupCache();
+
+        // Read the cache or something idk I havent decided this yet
         void readCache(std::string subdir, std::string file_name);
         void writeCache(std::string subdir, std::string file_name, const Json::Value& data);
         Json::Value parseToJson(const std::string& jsonString);

@@ -49,7 +49,16 @@ int Window::createWindow(const char* windowName)
         return 1;
     }
     
-    w_font = load_font(fontPath.c_str());
+    w_font = loadFont(fontPath.c_str());
+
+    if (w_font == nullptr) // In case it doesn't catch it within loadFont
+    {
+        logger->Error("Failed to load font");
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
 
     /*
         if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
@@ -130,7 +139,7 @@ int Window::loopWindow()
         SDL_RenderFillRect(renderer, &chat_window);
 
         // Render text to screen
-        render_text(renderer, "I love latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
+        renderText(renderer, "I love latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
         SDL_RenderPresent(renderer);
         SDL_Delay(10);
     }
