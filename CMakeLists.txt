@@ -41,14 +41,15 @@ CPMAddPackage(
   GIT_TAG 1.8.1
 )
 
-CPMAddPackage(
-  NAME IXWebSocket
-  GITHUB_REPOSITORY machinezone/IXWebSocket
-  GIT_TAG origin/master
-)
+#CPMAddPackage(
+#  NAME IXWebSocket
+#  GITHUB_REPOSITORY machinezone/IXWebSocket
+#  GIT_TAG origin/master
+#)
 
 find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
+find_package(ixwebsocket REQUIRED)
 
 # PNG and ZLIB seem to be broken using CPM
 # Will have to mantually find and link them
@@ -62,7 +63,7 @@ target_link_libraries(${PROJECT_NAME}
     ${SDL2PP_LIBRARIES}
     jsoncpp_lib
     cpr::cpr
-    ${IXWEBSOCKET_LIBRARY}
+    ixwebsocket::ixwebsocket
 )
 
 # Custom target for client
@@ -74,11 +75,11 @@ target_link_libraries(client
     ${SDL2PP_LIBRARIES}
     jsoncpp_lib
     cpr::cpr
-    ${IXWEBSOCKET_LIBRARY}
+    ixwebsocket::ixwebsocket
 )
 
 # Custom target for requests
-add_executable(requests ${SRC_DIR}/requests.cpp ${SRC_DIR}/logging.cpp)
+add_executable(requests ${SRC_DIR}/requests.cpp ${SRC_DIR}/logging.cpp ${SRC_DIR}/websocket.cpp)
 
 target_link_libraries(requests
     ZLIB::ZLIB
@@ -86,5 +87,5 @@ target_link_libraries(requests
     ${SDL2PP_LIBRARIES}
     jsoncpp_lib
     cpr::cpr
-    ${IXWEBSOCKET_LIBRARY}
+    ixwebsocket::ixwebsocket
 )

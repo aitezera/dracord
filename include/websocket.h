@@ -1,7 +1,13 @@
 #pragma once
 
 #include <string>
-#include "ixwebsocket/IXWebSocket.h"
+#include <ixwebsocket/IXNetSystem.h>
+#include <ixwebsocket/IXWebSocket.h>
+#include <ixwebsocket/IXUserAgent.h>
+#include <json/json.h>
+
+const std::string GATEWAY_URL = "wss://gateway.discord.gg/?v=9&encoding=json";
+const int INTENTS = (1 << 0) | (1 << 9) | (1 << 1) | (1 << 12);
 
 typedef struct {
     std::string type;
@@ -10,5 +16,5 @@ typedef struct {
 
 
 void connectToGateway();
-void handleEvents(std::string event);
-void sendHeartBeat(std::string websocket);
+void handleEvents(const Json::Value& event);
+void sendHeartBeat(ix::WebSocket& websocket, int interval);

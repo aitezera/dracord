@@ -1,25 +1,9 @@
 #include "requests.h"
 #include "logging.h"
-
-/*
-    TODO:
-        - Cache the information from the API (friends, guilds, channels, messages)
-        - Move onto the SDL2 client and have the requests be used in the client (for the GUI and other things)
-*/
-
-/*
-    This is the main file for the requests. This will handle all the requests to the Discord API.
-    This will also handle the caching of the information from the API.
-
-    
-    I will most likely move to Websockets for messages and such, so this will only really act like a first time prompt to load information
-    from the API, or whenever the user launches the application. Though will need to add a way to refresh the cache if the user wants to.
-
-*/
+#include "websocket.h"
 
 // This needs to be here for now until I link it with the main file
 Log* logger = Log::getInstance();
-
 
 //
 //_____________________________________________________________________________________________________________________________
@@ -68,8 +52,7 @@ int Requests::loginUser() {
     logger->Info("Loading Channels from the Discord API");
     loadChannels();
 
-    logger->Info("Loading Messages from the Discord API");
-    // Load Messages || Leave this to Websockets?
+    connectToGateway();
 
     return 0;
 }
@@ -224,10 +207,15 @@ void Requests::loadFriends() {
     }
     
     for (const auto& friendObj : json) {
-        if (friendObj.isMember("id")) {
-            writeCache("friends", friendObj["id"].asString(), friendObj);
+        if (std::ifstream("cache/friends/" + friendObj["id"].asString() + ".json").good()) {
+            logger->Info(("Friend already exists in cache: " + friendObj["id"].asString()).c_str());
+            continue;
         } else {
-            logger->Error(("Failed to retrieve ID from JSON object: " + friendObj.toStyledString()).c_str());
+            if (friendObj.isMember("id")) {
+                writeCache("friends", friendObj["id"].asString(), friendObj);
+            } else {
+                logger->Error(("Failed to retrieve ID from JSON object: " + friendObj.toStyledString()).c_str());
+            }
         }
     }
 }
@@ -253,10 +241,15 @@ void Requests::loadGuilds() {
     }
 
     for (const auto& guildObj : json) {
-        if (guildObj.isMember("id")) {
-            writeCache("guilds", guildObj["id"].asString(), guildObj);
+        if (std::ifstream("cache/guilds/" + guildObj["id"].asString() + ".json").good()) {
+            logger->Info(("Guild already exists in cache: " + guildObj["id"].asString()).c_str());
+            continue;
         } else {
-            logger->Error(("Failed to retrieve ID from JSON object: " + guildObj.toStyledString()).c_str());
+            if (guildObj.isMember("id")) {
+                writeCache("guilds", guildObj["id"].asString(), guildObj);
+            } else {
+                logger->Error(("Failed to retrieve ID from JSON object: " + guildObj.toStyledString()).c_str());
+            }
         }
     }
 }
@@ -282,10 +275,15 @@ void Requests::loadChannels() {
     }
 
     for (const auto& channelObj : json) {
-        if (channelObj.isMember("id")) {
-            writeCache("channels", channelObj["id"].asString(), channelObj);
+        if (std::ifstream("cache/channels/" + channelObj["id"].asString() + ".json").good()) {
+            logger->Info(("Channel already exists in cache: " + channelObj["id"].asString()).c_str());
+            continue;
         } else {
-            logger->Error(("Failed to retrieve ID from JSON object: " + channelObj.toStyledString()).c_str());
+            if (channelObj.isMember("id")) {
+                writeCache("channels", channelObj["id"].asString(), channelObj);
+            } else {
+                logger->Error(("Failed to retrieve ID from JSON object: " + channelObj.toStyledString()).c_str());
+            }
         }
     }
 }
@@ -407,6 +405,7 @@ void Friend::send_message(long channel_id, std::string message) {
 };
 */
 
+string Requests::r_token = "";
 
 // Comment this out for make all
 int main() {

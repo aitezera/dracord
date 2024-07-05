@@ -10,7 +10,6 @@ using std::string;
 namespace fs = std::filesystem;
 class Requests {
     public:
-        Requests() {}
         ~Requests() {}
         
         string r_base_api = "https://discord.com/api/v9/";
@@ -25,11 +24,15 @@ class Requests {
         cpr::Header getHeaders() {
             return r_headers;
         }
+
+        static string getToken() {
+            return r_token;
+        }
         
         int loginUser();
 
     private:
-        string r_token;
+        static string r_token;
         string r_filename = "token.bin";
 
         cpr::Header r_headers = {
