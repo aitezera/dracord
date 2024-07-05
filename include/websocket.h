@@ -7,6 +7,8 @@
 #include <ixwebsocket/IXUserAgent.h>
 #include <json/json.h>
 
+#include "requests.h"
+
 using std::string;
 namespace fs = std::filesystem;
 
@@ -37,7 +39,7 @@ class WebSocket {
         const string r_cdn = "https://cdn.discordapp.com/";
         const string r_invite = "https://discord.gg/";
 
-        void connectToGateway();
+        void connectToGateway(const Requests& req);
     
     private:
         void handleEvents(const Json::Value& event);

@@ -16,9 +16,6 @@ int Requests::loginUser() {
     } else if (std::ifstream(r_filename).good()) {
         logger->Info("Loading token from file");
         loadToken();
-    } else {
-        handleStatusCode(401, "First time login: Token was Empty!");
-        return 1;
     }
 
     logger->Info("Updating Headers to include Token");
@@ -58,6 +55,10 @@ int Requests::loginUser() {
 
     logger->Info("Loading Message history from the Discord API");
     //loadMessages();
+    
+    WebSocket* ws = new WebSocket;
+    ws->connectToGateway(*this);
+    delete ws;
 
     return 0;
 }
@@ -413,12 +414,7 @@ int main() {
     std::string token;
 
     Requests requests(token);
-    WebSocket* ws = new WebSocket;
-
     requests.loginUser();
-
-    ws->connectToGateway();
-    delete ws;
 
     return 0;
 }

@@ -42,18 +42,20 @@ void WebSocket::sendHeartBeat(ix::WebSocket& w_websocket, int interval) {
     }
 }
 
-void WebSocket::connectToGateway() {
+void WebSocket::connectToGateway(const Requests& req) {
     ix::initNetSystem();
 
     logger->Info("Connecting to Discord gateway");
 
-    w_websocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
+    w_websocket.setOnMessageCallback([this, &req](const ix::WebSocketMessagePtr& msg) {
         if (msg->type == ix::WebSocketMessageType::Open) {
             logger->Info("Connected to Discord gateway");
 
             Json::Value identify;
-            Requests req;
             identify["op"] = 2;
+
+            // TODO: Figure some other way to get token from requests
+
             identify["d"]["token"] = req.r_token;
             identify["d"]["intents"] = DISCORD_ALL_INTENTS;
             identify["d"]["properties"]["$os"] = "linux";
@@ -66,7 +68,7 @@ void WebSocket::connectToGateway() {
         if (msg->type == ix::WebSocketMessageType::Close) {
             logger->Error(("Disconnected from Discord gateway: " + std::to_string(msg->closeInfo.code) + " - " + msg->closeInfo.reason).c_str());
             std::this_thread::sleep_for(std::chrono::seconds(5)); // Throttle reconnection attempts
-            connectToGateway();
+            connectToGateway(req);
         }
 
         if (msg->type == ix::WebSocketMessageType::Message) {
