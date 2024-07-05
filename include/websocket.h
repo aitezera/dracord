@@ -27,12 +27,10 @@ class WebSocket {
     public:
         WebSocket() {
             w_websocket.setUrl(r_gateway);
-            w_websocket.enableAutomaticReconnection();
         };
 
         ~WebSocket() {
             w_websocket.stop();
-            w_websocket.disableAutomaticReconnection();
         };
 
         const string r_gateway = "wss://gateway.discord.gg/?v=9&encoding=json";

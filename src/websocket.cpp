@@ -2,18 +2,12 @@
 #include "logging.h"
 #include "requests.h"
 
-//
-//_____________________________________________________________________________________________________________________________
-
 void WebSocket::handleEvents(const Json::Value& event) {
-    
-    // Check if event is an object and not null
     if (!event.isObject()) {
         logger->Error("Event is not a JSON object");
         return;
     }
 
-    // Check if "t" property exists and is a string
     if (!event.isMember("t") || !event["t"].isString()) {
         logger->Error("Event type (t) is missing or not a string");
         return;
@@ -23,34 +17,23 @@ void WebSocket::handleEvents(const Json::Value& event) {
 
     if (type == "MESSAGE_CREATE") {
         logger->Info(("User: " + event["d"]["author"]["username"].asString() + " created message: " + event["d"]["content"].asString()).c_str());
-
     } else if (type == "TYPING_START") {
         logger->Info(("User is typing: " + event["d"]["user_id"].asString() + " in channel: " + event["d"]["channel_id"].asString()).c_str());
-        
     } else if (type == "MESSAGE_DELETE") {
         logger->Info(("Message deleted: " + event["d"]["id"].asString() + " in channel: " + event["d"]["name"].asString()).c_str());
-
     } else if (type == "PRESENCE_UPDATE") {
-        logger->Info(("Presence updated: " + event["d"]["user"]["id"].asString() + " to: " + event["d"]["status"].asString() ).c_str());
-
+        logger->Info(("Presence updated: " + event["d"]["user"]["id"].asString() + " to: " + event["d"]["status"].asString()).c_str());
     } else if (type == "USER_SETTINGS_UPDATE") {
         logger->Info(("User:" + event["d"]["display_name"].asString() + " changed: " + event["d"]["key"].asString() + "to: " + event["d"]["value"].asString()).c_str());
-
     } else if (type == "MESSAGE_UPDATE") {
         logger->Info(("Message updated: " + event["d"]["content"].asString() + " in channel: " + event["d"]["channel_id"].asString()).c_str());
     }
-    
-    // Add more events here
 }
-
-//
-//_____________________________________________________________________________________________________________________________
 
 void WebSocket::sendHeartBeat(ix::WebSocket& w_websocket, int interval) {
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(interval));
         Json::Value heartbeat;
-
         heartbeat["op"] = 1;
         heartbeat["d"] = 251;
 
@@ -58,9 +41,6 @@ void WebSocket::sendHeartBeat(ix::WebSocket& w_websocket, int interval) {
         logger->Info("Heartbeat sent to keep connection alive");
     }
 }
-
-//
-//_____________________________________________________________________________________________________________________________
 
 void WebSocket::connectToGateway() {
     ix::initNetSystem();
@@ -83,24 +63,29 @@ void WebSocket::connectToGateway() {
             w_websocket.send(identify.toStyledString());
         }
 
+        if (msg->type == ix::WebSocketMessageType::Close) {
+            logger->Error(("Disconnected from Discord gateway: " + std::to_string(msg->closeInfo.code) + " - " + msg->closeInfo.reason).c_str());
+            std::this_thread::sleep_for(std::chrono::seconds(5)); // Throttle reconnection attempts
+            connectToGateway();
+        }
+
         if (msg->type == ix::WebSocketMessageType::Message) {
             Json::Value json;
             Json::Reader reader;
-            auto event = reader.parse(msg->str, json);
+            reader.parse(msg->str, json);
 
             if (json["op"].asInt() == 0) {
                 handleEvents(json);
             }
 
             static bool initialized = false;
-            if (!initialized && event["t"] == false && event["s"] == false) {
-                int heartbeatInterval = event["d"]["heartbeat_interval"];
+            if (!initialized && json["op"].asInt() == 10) {
+                int heartbeatInterval = json["d"]["heartbeat_interval"].asInt();
                 std::thread heartbeatThread([this, heartbeatInterval]() {
                     this->sendHeartBeat(w_websocket, heartbeatInterval);
                 });
 
                 heartbeatThread.detach();
-
                 initialized = true;
             }
         }
@@ -116,6 +101,3 @@ void WebSocket::connectToGateway() {
 
     ix::uninitNetSystem();
 }
-
-//
-//_____________________________________________________________________________________________________________________________
