@@ -2,7 +2,6 @@
 #include "logging.h"
 #include "websocket.h"
 
-// This needs to be here for now until I link it with the main file
 Log* logger = Log::getInstance();
 
 //
@@ -17,13 +16,16 @@ int Requests::loginUser() {
     } else if (std::ifstream(r_filename).good()) {
         logger->Info("Loading token from file");
         loadToken();
+    } else {
+        handleStatusCode(401, "First time login: Token was Empty!");
+        return 1;
     }
 
     logger->Info("Updating Headers to include Token");
     updateHeaders();
 
     logger->Info("Attempting to login user with Discord API");
-    cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me"}, r_headers);
+    cpr::Response response = cpr::Get(cpr::Url{r_api + "users/@me"}, r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
@@ -38,8 +40,10 @@ int Requests::loginUser() {
         saveToken();
     }
 
-    logger->Info("Attemping to set up cache folders");
-    setupCache();
+    if (!fs::exists("cache")) {
+        logger->Info("Creating folder for cache");
+        setupCache();
+    }
 
     logger->Info("Loading Friends from the Discord API");
     loadFriends();
@@ -52,7 +56,8 @@ int Requests::loginUser() {
     logger->Info("Loading Channels from the Discord API");
     loadChannels();
 
-    connectToGateway();
+    logger->Info("Loading Message history from the Discord API");
+    //loadMessages();
 
     return 0;
 }
@@ -62,10 +67,8 @@ int Requests::loginUser() {
 
 void Requests::setupCache() {
 
-    if (!fs::exists("cache")) {
-        logger->Info("Creating folder for cache");
-        fs::create_directory("cache");
-    }
+    logger->Info("Creating folder for cache");
+    fs::create_directory("cache");
 
     if (!fs::exists("cache/friends")) {
         logger->Info("Creating folder for friends cache");
@@ -121,6 +124,7 @@ void Requests::readCache(std::string subdir, std::string file_name) {
                 case 1: // Int
                     valueStr = std::to_string(value.asInt());
                     break;
+
                 case 2: // UInt
                     valueStr = std::to_string(value.asUInt());
                     break;
@@ -190,7 +194,7 @@ Json::Value Requests::parseToJson(const std::string& jsonString) {
 //_____________________________________________________________________________________________________________________________
 
 void Requests::loadFriends() {
-    cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/relationships"}, r_headers=r_headers);
+    cpr::Response response = cpr::Get(cpr::Url{r_api + "users/@me/relationships"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
@@ -208,7 +212,7 @@ void Requests::loadFriends() {
     
     for (const auto& friendObj : json) {
         if (std::ifstream("cache/friends/" + friendObj["id"].asString() + ".json").good()) {
-            logger->Info(("Friend already exists in cache: " + friendObj["id"].asString()).c_str());
+            //logger->Info(("Friend already exists in cache: " + friendObj["id"].asString()).c_str());
             continue;
         } else {
             if (friendObj.isMember("id")) {
@@ -224,7 +228,7 @@ void Requests::loadFriends() {
 //_____________________________________________________________________________________________________________________________
 
 void Requests::loadGuilds() {
-    cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/guilds"}, r_headers=r_headers);
+    cpr::Response response = cpr::Get(cpr::Url{r_api + "users/@me/guilds"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
@@ -242,7 +246,7 @@ void Requests::loadGuilds() {
 
     for (const auto& guildObj : json) {
         if (std::ifstream("cache/guilds/" + guildObj["id"].asString() + ".json").good()) {
-            logger->Info(("Guild already exists in cache: " + guildObj["id"].asString()).c_str());
+            //logger->Info(("Guild already exists in cache: " + guildObj["id"].asString()).c_str());
             continue;
         } else {
             if (guildObj.isMember("id")) {
@@ -258,7 +262,7 @@ void Requests::loadGuilds() {
 //_____________________________________________________________________________________________________________________________
 
 void Requests::loadChannels() {
-    cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/channels"}, r_headers=r_headers);
+    cpr::Response response = cpr::Get(cpr::Url{r_api + "users/@me/channels"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
@@ -276,7 +280,7 @@ void Requests::loadChannels() {
 
     for (const auto& channelObj : json) {
         if (std::ifstream("cache/channels/" + channelObj["id"].asString() + ".json").good()) {
-            logger->Info(("Channel already exists in cache: " + channelObj["id"].asString()).c_str());
+            //logger->Info(("Channel already exists in cache: " + channelObj["id"].asString()).c_str());
             continue;
         } else {
             if (channelObj.isMember("id")) {
@@ -292,7 +296,7 @@ void Requests::loadChannels() {
 //_____________________________________________________________________________________________________________________________
 
 void Requests::loadMessages() {    
-    cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/channels"}, r_headers=r_headers);
+    cpr::Response response = cpr::Get(cpr::Url{r_api + "users/@me/channels"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
@@ -394,8 +398,8 @@ void Friend::send_message(long channel_id, std::string message) {
     Json::StreamWriterBuilder builder;
     std::string json_string = Json::writeString(builder, json);
 
-    cpr::Response response = cpr::Post(cpr::Url{req.r_base_api + "channels/" + std::to_string(channel_id) + "/messages"}, cpr::Body{json_string}, headers=headers);
-    logger->Info(("Using POST response with URL: " + req.r_base_api + "channels/" + std::to_string(channel_id) + "/messages").c_str());
+    cpr::Response response = cpr::Post(cpr::Url{req.r_api + "channels/" + std::to_string(channel_id) + "/messages"}, cpr::Body{json_string}, headers=headers);
+    logger->Info(("Using POST response with URL: " + req.r_api + "channels/" + std::to_string(channel_id) + "/messages").c_str());
 
     if (response.status_code != 200) {
         return;
@@ -405,16 +409,16 @@ void Friend::send_message(long channel_id, std::string message) {
 };
 */
 
-string Requests::r_token = "";
-
-// Comment this out for make all
 int main() {
-    // This is here for testing purposes only
-    // Main will be removed from this once I have the requests finished
     std::string token;
 
     Requests requests(token);
+    WebSocket* ws = new WebSocket;
+
     requests.loginUser();
+
+    ws->connectToGateway();
+    delete ws;
 
     return 0;
 }

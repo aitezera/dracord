@@ -5,34 +5,27 @@
 #include <string>
 #include <filesystem>
 
-
 using std::string;
 namespace fs = std::filesystem;
+
+class WebSocket;
+
 class Requests {
+    friend class WebSocket;
+
     public:
-        ~Requests() {}
-        
-        string r_base_api = "https://discord.com/api/v9/";
-        string r_base_gateway = "wss://gateway.discord.gg/?v=9&encoding=json";
-        string r_base_cdn = "https://cdn.discordapp.com/";
-        string r_base_invite = "https://discord.gg/";
+        ~Requests() {};
+        Requests() {};
 
         Requests(string uToken) {
             r_token = uToken;  // Set token
         }
 
-        cpr::Header getHeaders() {
-            return r_headers;
-        }
-
-        static string getToken() {
-            return r_token;
-        }
-        
+        string r_api = "https://discord.com/api/v9/";
         int loginUser();
 
     private:
-        static string r_token;
+        string r_token;
         string r_filename = "token.bin";
 
         cpr::Header r_headers = {

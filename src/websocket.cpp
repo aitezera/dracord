@@ -2,8 +2,11 @@
 #include "logging.h"
 #include "requests.h"
 
-void handleEvents(const Json::Value& event) {
+//
+//_____________________________________________________________________________________________________________________________
 
+void WebSocket::handleEvents(const Json::Value& event) {
+    
     // Check if event is an object and not null
     if (!event.isObject()) {
         logger->Error("Event is not a JSON object");
@@ -17,20 +20,33 @@ void handleEvents(const Json::Value& event) {
     }
 
     std::string type = event["t"].asString();
-    logger->Info(("Event type: " + type).c_str());
 
     if (type == "MESSAGE_CREATE") {
-        logger->Info(("Message created: " + event["d"]["content"].asString()).c_str());
+        logger->Info(("User: " + event["d"]["author"]["username"].asString() + " created message: " + event["d"]["content"].asString()).c_str());
+
     } else if (type == "TYPING_START") {
-        logger->Info(("User is typing: " + event["d"]["user_id"].asString() + "in channel: " + event["d"]["channel_id"].asString()).c_str());
+        logger->Info(("User is typing: " + event["d"]["user_id"].asString() + " in channel: " + event["d"]["channel_id"].asString()).c_str());
+        
     } else if (type == "MESSAGE_DELETE") {
-        logger->Info(("Message deleted: " + event["d"]["id"].asString() + "in channel: " + event["d"]["channel_id"].asString()).c_str());
+        logger->Info(("Message deleted: " + event["d"]["id"].asString() + " in channel: " + event["d"]["name"].asString()).c_str());
+
+    } else if (type == "PRESENCE_UPDATE") {
+        logger->Info(("Presence updated: " + event["d"]["user"]["id"].asString() + " to: " + event["d"]["status"].asString() ).c_str());
+
+    } else if (type == "USER_SETTINGS_UPDATE") {
+        logger->Info(("User:" + event["d"]["display_name"].asString() + " changed: " + event["d"]["key"].asString() + "to: " + event["d"]["value"].asString()).c_str());
+
+    } else if (type == "MESSAGE_UPDATE") {
+        logger->Info(("Message updated: " + event["d"]["content"].asString() + " in channel: " + event["d"]["channel_id"].asString()).c_str());
     }
     
     // Add more events here
 }
 
-void sendHeartBeat(ix::WebSocket& websocket, int interval) {
+//
+//_____________________________________________________________________________________________________________________________
+
+void WebSocket::sendHeartBeat(ix::WebSocket& w_websocket, int interval) {
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(interval));
         Json::Value heartbeat;
@@ -38,32 +54,33 @@ void sendHeartBeat(ix::WebSocket& websocket, int interval) {
         heartbeat["op"] = 1;
         heartbeat["d"] = 251;
 
-        websocket.send(heartbeat.toStyledString());
+        w_websocket.send(heartbeat.toStyledString());
+        logger->Info("Heartbeat sent to keep connection alive");
     }
 }
 
-void connectToGateway() {
-    //ix::initNetSystem();
+//
+//_____________________________________________________________________________________________________________________________
 
-    ix::WebSocket webSocket;
-    webSocket.setUrl(GATEWAY_URL);
+void WebSocket::connectToGateway() {
+    ix::initNetSystem();
 
     logger->Info("Connecting to Discord gateway");
 
-    webSocket.setOnMessageCallback([&webSocket](const ix::WebSocketMessagePtr& msg) {
+    w_websocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
         if (msg->type == ix::WebSocketMessageType::Open) {
             logger->Info("Connected to Discord gateway");
 
             Json::Value identify;
+            Requests req;
             identify["op"] = 2;
-            identify["d"]["token"] = Requests::getToken();
-            identify["d"]["intents"] = INTENTS;
+            identify["d"]["token"] = req.r_token;
+            identify["d"]["intents"] = DISCORD_ALL_INTENTS;
             identify["d"]["properties"]["$os"] = "linux";
-            identify["d"]["properties"]["$browser"] = "google-chrome";
-            identify["d"]["properties"]["$device"] = "chrome";
+            identify["d"]["properties"]["$browser"] = "my_library";
+            identify["d"]["properties"]["$device"] = "my_library";
 
-            webSocket.send(identify.toStyledString());
-            logger->Info("Sent identify message");
+            w_websocket.send(identify.toStyledString());
         }
 
         if (msg->type == ix::WebSocketMessageType::Message) {
@@ -78,7 +95,10 @@ void connectToGateway() {
             static bool initialized = false;
             if (!initialized && event["t"] == false && event["s"] == false) {
                 int heartbeatInterval = event["d"]["heartbeat_interval"];
-                std::thread heartbeatThread(sendHeartBeat, std::ref(webSocket), heartbeatInterval);
+                std::thread heartbeatThread([this, heartbeatInterval]() {
+                    this->sendHeartBeat(w_websocket, heartbeatInterval);
+                });
+
                 heartbeatThread.detach();
 
                 initialized = true;
@@ -86,13 +106,16 @@ void connectToGateway() {
         }
     });
 
-    logger->Info("Starting websocket");
-    webSocket.start();
-    logger->Info("Running websocket");
+    logger->Info("Starting Websocket");
+    w_websocket.start();
+    logger->Info("Running Websocket");
 
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(10));
     }
 
-    //ix::uninitNetSystem();
+    ix::uninitNetSystem();
 }
+
+//
+//_____________________________________________________________________________________________________________________________
