@@ -43,10 +43,12 @@ class Requests {
         }
 
         // Read and write token to file
+
         void saveToken();
         void loadToken();
     
         // API Requests
+        
         void loadFriends();
         void loadGuilds();
         void loadChannels();
@@ -54,9 +56,8 @@ class Requests {
         void handleStatusCode(int r_status_code, string r_error);
 
         // Cache related functions
-        void setupCache();
 
-        // Read the cache or something idk I havent decided this yet
+        void setupCache();
         void readCache(std::string subdir, std::string file_name);
         void writeCache(std::string subdir, std::string file_name, const Json::Value& data);
         Json::Value parseToJson(const std::string& jsonString);

@@ -23,6 +23,7 @@ Log* logger = Log::getInstance();
 
 //
 //_____________________________________________________________________________________________________________________________
+
 int Requests::loginUser() {
 
     if (r_token.empty() && !std::ifstream(r_filename).good()) {
@@ -46,7 +47,7 @@ int Requests::loginUser() {
         return 1;
     }
 
-    logger->Info(("Response: " + std::string(response.text)).c_str()); // Remove this once I know what I need to do with the response
+    //logger->Info(("Response: " + std::string(response.text)).c_str()); // Remove this once I know what I need to do with the response
     logger->Info("User logged in successfully!");
 
     if (!std::ifstream(r_filename).good()) {
@@ -57,18 +58,18 @@ int Requests::loginUser() {
     setupCache();
 
     logger->Info("Loading Friends from the Discord API");
-    // Load Friends
+    loadFriends();
+
     logger->Info("Loading Guilds from the Discord API");
-    // Load Guilds
+    loadGuilds();
+
+    // Fix Channels only loading DMs and not Guilds
+    // Bundle DMs with Friends and Guilds with Channels
     logger->Info("Loading Channels from the Discord API");
-    // Load Channels
+    loadChannels();
+
     logger->Info("Loading Messages from the Discord API");
     // Load Messages || Leave this to Websockets?
-
-    Json::Value test;
-    test = parseToJson(response.text);
-    writeCache("friends", "test", test);
-    readCache("friends", "test2");
 
     return 0;
 }
@@ -173,6 +174,7 @@ void Requests::readCache(std::string subdir, std::string file_name) {
 //
 //_____________________________________________________________________________________________________________________________
 
+// This will overwrite the cache file
 void Requests::writeCache(std::string subdir, std::string file_name, const Json::Value& data) {    
     Json::StreamWriterBuilder writer;
     writer["indentation"] = "\t";
@@ -205,8 +207,6 @@ Json::Value Requests::parseToJson(const std::string& jsonString) {
 //_____________________________________________________________________________________________________________________________
 
 void Requests::loadFriends() {
-    logger->Info("Loading Friends");
-
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/relationships"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
@@ -215,15 +215,27 @@ void Requests::loadFriends() {
         return;
     }
 
-    logger->Info(("Response: " + std::string(response.text)).c_str()); 
+    Json::Value json;
+    json = parseToJson(response.text);
+
+    if (!json.isArray()) {
+        logger->Error("Failed to parse JSON to Array");
+        return;
+    }
+    
+    for (const auto& friendObj : json) {
+        if (friendObj.isMember("id")) {
+            writeCache("friends", friendObj["id"].asString(), friendObj);
+        } else {
+            logger->Error(("Failed to retrieve ID from JSON object: " + friendObj.toStyledString()).c_str());
+        }
+    }
 }
 
 //
 //_____________________________________________________________________________________________________________________________
 
 void Requests::loadGuilds() {
-    logger->Info("Loading Guilds");
-
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/guilds"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
@@ -232,15 +244,27 @@ void Requests::loadGuilds() {
         return;
     }
 
-    logger->Info(("Response: " + std::string(response.text)).c_str());
+    Json::Value json;
+    json = parseToJson(response.text);
+
+    if (!json.isArray()) {
+        logger->Error("Failed to parse JSON to Array");
+        return;
+    }
+
+    for (const auto& guildObj : json) {
+        if (guildObj.isMember("id")) {
+            writeCache("guilds", guildObj["id"].asString(), guildObj);
+        } else {
+            logger->Error(("Failed to retrieve ID from JSON object: " + guildObj.toStyledString()).c_str());
+        }
+    }
 }
 
 //
 //_____________________________________________________________________________________________________________________________
 
 void Requests::loadChannels() {
-    logger->Info("Loading Channels");
-
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/channels"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
@@ -249,15 +273,27 @@ void Requests::loadChannels() {
         return;
     }
 
-    logger->Info(("Response: " + std::string(response.text)).c_str());
+    Json::Value json;
+    json = parseToJson(response.text);
+
+    if (!json.isArray()) {
+        logger->Error("Failed to parse JSON to Array");
+        return;
+    }
+
+    for (const auto& channelObj : json) {
+        if (channelObj.isMember("id")) {
+            writeCache("channels", channelObj["id"].asString(), channelObj);
+        } else {
+            logger->Error(("Failed to retrieve ID from JSON object: " + channelObj.toStyledString()).c_str());
+        }
+    }
 }
 
 //
 //_____________________________________________________________________________________________________________________________
 
-void Requests::loadMessages() {
-    logger->Info("Loading Messages");
-    
+void Requests::loadMessages() {    
     cpr::Response response = cpr::Get(cpr::Url{r_base_api + "users/@me/channels"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 

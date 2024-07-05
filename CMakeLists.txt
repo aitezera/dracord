@@ -41,6 +41,12 @@ CPMAddPackage(
   GIT_TAG 1.8.1
 )
 
+CPMAddPackage(
+  NAME IXWebSocket
+  GITHUB_REPOSITORY machinezone/IXWebSocket
+  GIT_TAG origin/master
+)
+
 find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
 
@@ -56,6 +62,7 @@ target_link_libraries(${PROJECT_NAME}
     ${SDL2PP_LIBRARIES}
     jsoncpp_lib
     cpr::cpr
+    ${IXWEBSOCKET_LIBRARY}
 )
 
 # Custom target for client
@@ -67,10 +74,11 @@ target_link_libraries(client
     ${SDL2PP_LIBRARIES}
     jsoncpp_lib
     cpr::cpr
+    ${IXWEBSOCKET_LIBRARY}
 )
 
 # Custom target for requests
-add_executable(requests ${SRC_DIR}/requests.cpp ${SRC_DIR}/logging.cpp ${SRC_DIR}/friend.cpp)
+add_executable(requests ${SRC_DIR}/requests.cpp ${SRC_DIR}/logging.cpp)
 
 target_link_libraries(requests
     ZLIB::ZLIB
@@ -78,4 +86,5 @@ target_link_libraries(requests
     ${SDL2PP_LIBRARIES}
     jsoncpp_lib
     cpr::cpr
+    ${IXWEBSOCKET_LIBRARY}
 )
