@@ -1,6 +1,10 @@
 #include "button.h"
 #include "logging.h"
 
+//
+//_____________________________________________________________________________________________________________________________
+
+
 Button::Button(int id, int posX, int posY, int width, int height, string text, SDL_Color textColour, SDL_Renderer *renderer) {
     this->unique_id = id;
     this->x = posX;
@@ -10,6 +14,10 @@ Button::Button(int id, int posX, int posY, int width, int height, string text, S
     this->text = text;
     this->textColour = textColour;
 }
+
+//
+//_____________________________________________________________________________________________________________________________
+
 
 Button::Button(int id, int posX, int posY, int width, int height, string text, SDL_Color textColour, string filePath, SDL_Renderer *renderer) {
     this->unique_id = id;
@@ -29,9 +37,17 @@ Button::Button(int id, int posX, int posY, int width, int height, string text, S
     }
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
+
 Button::~Button() {
     SDL_DestroyTexture(texture);
 }
+
+//
+//_____________________________________________________________________________________________________________________________
+
 
 void Button::render(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_Rect rect = {x, y, w, h};
@@ -54,7 +70,13 @@ void Button::render(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_DestroyTexture(textTexture);
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
 
 bool Button::isClicked(int mouseX, int mouseY) {
     return mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
 }
+
+//
+//_____________________________________________________________________________________________________________________________

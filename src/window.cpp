@@ -5,10 +5,18 @@
 #include "label.h"
 #include "textfield.h"
 
+//
+//_____________________________________________________________________________________________________________________________
+
+
 Label* label;
 Button* button;
 Button* button2;
 TextField* textfield;
+
+//
+//_____________________________________________________________________________________________________________________________
+
 
 int Window::createWindow(const char* windowName)
 {
@@ -47,11 +55,15 @@ int Window::createWindow(const char* windowName)
 
     logger->Info("Renderer created successfully!");
 
+    logger->Info("Initalising Label");
     label = new Label("This is a label", 10, 10, { 255, 255, 255, 255 });
-    textfield = new TextField(10, 50, 200, 50, renderer);
 
+    logger->Info("Initalising TextField");
+    textfield = new TextField(10, 50, 200, 20, 30, renderer);
+    
+    logger->Info("Initalising Buttons");
     button = new Button(1, 100, 100, 100, 100, "Test", { 0, 255, 0, 255 }, renderer);
-    button2 = new Button(2, 300, 300, 100, 100, "Test2", { 0, 0, 255, 255 }, "images/test.jpg", renderer);
+    button2 = new Button(2, 100, 300, 100, 100, "Test2", { 0, 0, 255, 255 }, "images/test.jpg", renderer);
 
     /*
         if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
@@ -100,6 +112,10 @@ int Window::createWindow(const char* windowName)
     return 0;
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
+
 int Window::loopWindow()
 {
     logger->Info("Looping Window");
@@ -136,12 +152,12 @@ int Window::loopWindow()
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        button->render(renderer, label->getFont());
-        button2->render(renderer, label->getFont());
-        textfield->render(renderer, label->getFont());
+        //button->render(renderer, label->getFont());
+        //button2->render(renderer, label->getFont());
+        textfield->render(renderer);
         
         // Render text to screen
-        label->render(renderer);
+        //label->render(renderer);
         SDL_RenderPresent(renderer);
 
         SDL_Delay(10);
@@ -153,9 +169,13 @@ int Window::loopWindow()
     return 0;
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
+
 int Window::destroyWindow()
 {
-    logger->Info("Destroying all components of the Window");
+    logger->Info("Destroying Window Components");
 
     //if (texture != nullptr) {
     //    logger->Info("Destroying texture");
@@ -197,3 +217,6 @@ int Window::destroyWindow()
 
     return 0;
 }
+
+//
+//_____________________________________________________________________________________________________________________________

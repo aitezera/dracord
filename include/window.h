@@ -10,8 +10,8 @@
 
 class Window {
     private:
-        const int WIDTH = 320*2;
-        const int HEIGHT = 240*2;
+        const int WIDTH = 320*2; // Starting Width
+        const int HEIGHT = 240*2; // Starting Height
         bool running = true;
 
     public:

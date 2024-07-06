@@ -1,6 +1,10 @@
 #include "label.h"
 #include "logging.h"
 
+//
+//_____________________________________________________________________________________________________________________________
+
+
 Label::Label(std::string text, int x, int y, SDL_Color color) {
     this->text = text;
     this->x = x;
@@ -8,6 +12,10 @@ Label::Label(std::string text, int x, int y, SDL_Color color) {
     this->font = loadFont(getFontPath("Roboto-Regular.ttf").c_str()); // Will automatically assume the font is in the assets/fonts directory | Need to see if universal fonts work
     this->color = color;
 }
+
+//
+//_____________________________________________________________________________________________________________________________
+
 
 Label::Label(std::string text, int x, int y, SDL_Color color, std::string fontPath) {
     this->text = text;
@@ -17,13 +25,24 @@ Label::Label(std::string text, int x, int y, SDL_Color color, std::string fontPa
     this->color = color;
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
 Label::~Label() {
     TTF_CloseFont(font);
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
+
 TTF_Font* Label::getFont() {
     return this->font;
 }
+
+//
+//_____________________________________________________________________________________________________________________________
+
 
 TTF_Font* Label::loadFont(const char* file) {
     if (TTF_Init() == -1) {
@@ -43,6 +62,10 @@ TTF_Font* Label::loadFont(const char* file) {
     logger->Info(("Loaded font successfully from file: " + std::string(file)).c_str());
     return font;
 }
+
+//
+//_____________________________________________________________________________________________________________________________
+
 
 void Label::render(SDL_Renderer* renderer) {
     SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
@@ -69,6 +92,10 @@ void Label::render(SDL_Renderer* renderer) {
     SDL_DestroyTexture(texture);
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
+
 std::string Label::getFontPath(const std::string& fontName) {
     // Get the path to the current executable
     fs::path execPath = fs::current_path();
@@ -92,3 +119,6 @@ std::string Label::getFontPath(const std::string& fontName) {
 
     return fontPath.string();
 }
+
+//
+//_____________________________________________________________________________________________________________________________

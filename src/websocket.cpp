@@ -2,6 +2,10 @@
 #include "logging.h"
 #include "requests.h"
 
+//
+//_____________________________________________________________________________________________________________________________
+
+
 void WebSocket::handleEvents(const Json::Value& event) {
     if (!event.isObject()) {
         logger->Error("Event is not a JSON object");
@@ -36,6 +40,10 @@ void WebSocket::handleEvents(const Json::Value& event) {
     }
 }
 
+//
+//_____________________________________________________________________________________________________________________________
+
+
 void WebSocket::sendHeartBeat(ix::WebSocket& w_websocket, int interval) {
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(interval));
@@ -47,6 +55,10 @@ void WebSocket::sendHeartBeat(ix::WebSocket& w_websocket, int interval) {
         logger->Info("Heartbeat sent to keep connection alive");
     }
 }
+
+//
+//_____________________________________________________________________________________________________________________________
+
 
 void WebSocket::connectToGateway(const Requests& req) {
     ix::initNetSystem();
@@ -110,3 +122,6 @@ void WebSocket::connectToGateway(const Requests& req) {
 
     ix::uninitNetSystem();
 }
+
+//
+//_____________________________________________________________________________________________________________________________
