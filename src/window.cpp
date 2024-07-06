@@ -98,11 +98,13 @@ int Window::loopWindow()
                 SDL_GetMouseState(&mouseX, &mouseY);
                 if (button->isClicked(mouseX, mouseY))
                 {
-                    logger->Info(("Text:" + textfield->getText()).c_str());
+                    //logger->Info(("Text:" + textfield->getText()).c_str());
+                    logger->Info(("Changing Label text to: " + textfield->getText()).c_str());
                     label->changeText(textfield->getText());
                 }
                 if (button2->isClicked(mouseX, mouseY))
                 {
+                    logger->Info("Changing label back to default: This is a label");
                     label->changeText("This is a label");
                 }
             }
