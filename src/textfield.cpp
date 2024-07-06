@@ -30,6 +30,7 @@ void TextField::render(SDL_Renderer* renderer, TTF_Font* font) {
     SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), textColour);
 
     // There is an error with the surface ^^ Fix when I wake up
+    // Also fix the text going outside the textfield
     if (!surface) {
         logger->Error(("Failed to render text for textfield: " + std::string(TTF_GetError())).c_str());
         return;

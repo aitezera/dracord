@@ -47,7 +47,7 @@ int Window::createWindow(const char* windowName)
 
     logger->Info("Renderer created successfully!");
 
-    label = new Label("I love latinas", 10, 10, { 255, 255, 255, 255 });
+    label = new Label("This is a label", 10, 10, { 255, 255, 255, 255 });
     textfield = new TextField(10, 50, 200, 50, renderer);
 
     button = new Button(1, 100, 100, 100, 100, "Test", { 0, 255, 0, 255 }, renderer);
