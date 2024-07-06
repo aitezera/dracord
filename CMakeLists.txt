@@ -89,7 +89,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 # Custom target for client
-add_executable(client ${SRC_DIR}/main.cpp ${SRC_DIR}/window.cpp ${SRC_DIR}/ui.cpp ${SRC_DIR}/logging.cpp ${SRC_DIR}/button.cpp)
+add_executable(client ${SRC_DIR}/main.cpp ${SRC_DIR}/window.cpp ${SRC_DIR}/label.cpp ${SRC_DIR}/logging.cpp ${SRC_DIR}/button.cpp)
 
 target_link_libraries(client
     ZLIB::ZLIB

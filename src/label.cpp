@@ -1,8 +1,23 @@
-#include "ui.h"
+#include "label.h"
 #include "logging.h"
 
-TTF_Font* UI::loadFont(const char* file) {
-    
+Label::Label(std::string text, int x, int y, SDL_Color color) {
+    this->text = text;
+    this->x = x;
+    this->y = y;
+    this->font = loadFont(getFontPath("Roboto-Regular.ttf").c_str());
+    this->color = color;
+}
+
+Label::~Label() {
+    TTF_CloseFont(font);
+}
+
+TTF_Font* Label::getFont() {
+    return this->font;
+}
+
+TTF_Font* Label::loadFont(const char* file) {
     if (TTF_Init() == -1) {
         logger->Error(("Failed to initialize TTF: " + std::string(TTF_GetError())).c_str());
     }
@@ -20,8 +35,8 @@ TTF_Font* UI::loadFont(const char* file) {
     return font;
 }
 
-void UI::renderText(SDL_Renderer* renderer, const char* text, SDL_Color color, int x, int y, TTF_Font* font) {
-    SDL_Surface* surface = TTF_RenderText_Solid(font, text, color);
+void Label::render(SDL_Renderer* renderer) {
+    SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
 
     if (!surface) {
         logger->Error(("Failed to render text: " + std::string(TTF_GetError())).c_str());
@@ -45,7 +60,7 @@ void UI::renderText(SDL_Renderer* renderer, const char* text, SDL_Color color, i
     SDL_DestroyTexture(texture);
 }
 
-std::string UI::getFontPath(const std::string& fontName) {
+std::string Label::getFontPath(const std::string& fontName) {
     // Get the path to the current executable
     fs::path execPath = fs::current_path();
 

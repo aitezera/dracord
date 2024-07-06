@@ -1,7 +1,9 @@
 #include "window.h"
 #include "logging.h"
 #include "button.h"
+#include "label.h"
 
+Label* label;
 Button* button;
 Button* button2;
 
@@ -19,7 +21,7 @@ int Window::createWindow(const char* windowName)
                         SDL_WINDOWPOS_CENTERED, 
                         SDL_WINDOWPOS_CENTERED, 
                         WIDTH, HEIGHT,
-                        SDL_WINDOW_SHOWN);
+                        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     if (!window)
     { 
@@ -42,28 +44,7 @@ int Window::createWindow(const char* windowName)
 
     logger->Info("Renderer created successfully!");
 
-    std::string fontPath = getFontPath("Roboto-Regular.ttf");
-
-    if (fontPath.empty())
-    {
-        logger->Error("Failed to fetch font path");
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return 1;
-    }
-    
-    w_font = loadFont(fontPath.c_str());
-
-    if (w_font == nullptr) // In case it doesn't catch it within loadFont
-    {
-        logger->Error("Failed to load font");
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return 1;
-    }
-    
+    label = new Label("I love latinas", 10, 10, { 255, 255, 255, 255 });
     button = new Button(1, 100, 100, 100, 100, "Test", { 0, 255, 0, 255 }, renderer);
     button2 = new Button(2, 300, 300, 100, 100, "Test2", { 0, 0, 255, 255 }, "images/test.jpg", renderer);
 
@@ -138,18 +119,17 @@ int Window::loopWindow()
                 {
                     logger->Info("Button 2 clicked!");
                 }
-
             }
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        button->render(renderer, w_font);
-        button2->render(renderer, w_font);
+        button->render(renderer, label->getFont());
+        button2->render(renderer, label->getFont());
         
         // Render text to screen
-        renderText(renderer, "I love latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
+        label->render(renderer);
         SDL_RenderPresent(renderer);
 
         SDL_Delay(10);
@@ -183,10 +163,9 @@ int Window::destroyWindow()
         window = nullptr;
     }
 
-    if (w_font != nullptr) {
+    if (label != nullptr) {
         logger->Info("Destroying TTF Font Library");
-        TTF_CloseFont(w_font);
-        w_font = nullptr;
+        delete label;
     }
 
     if (button != nullptr) {

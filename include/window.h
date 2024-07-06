@@ -7,9 +7,8 @@
 #include <iostream>
 #include <memory>
 
-#include "ui.h"
 
-class Window : UI {
+class Window {
     private:
         const int WIDTH = 320*2;
         const int HEIGHT = 240*2;
@@ -19,7 +18,6 @@ class Window : UI {
         ~Window() {
             SDL_DestroyRenderer(renderer);
             SDL_DestroyWindow(window);
-            TTF_CloseFont(w_font);
             TTF_Quit();
             SDL_Quit();
         }
@@ -31,7 +29,6 @@ class Window : UI {
         SDL_Event event = { 0 };
         SDL_Surface* loadedSurface = nullptr;
         SDL_Texture* texture = nullptr;
-        TTF_Font* w_font = nullptr;
         
         SDL_Rect sidebar;
         SDL_Rect friend_sidebar;
