@@ -3,6 +3,7 @@
 #include "button.h"
 
 Button* button;
+Button* button2;
 
 int Window::createWindow(const char* windowName)
 {
@@ -62,8 +63,12 @@ int Window::createWindow(const char* windowName)
         SDL_Quit();
         return 1;
     }
+    
+    SDL_Color textColor = { 0, 255, 0, 255 };
+    std::string filePath = "images/test.jpg";
 
-    button = new Button(1, 100, 100, 100, 100, "Test", {0, 255, 0, 255}, renderer);
+    button = new Button(1, 100, 100, 100, 100, "Test", textColor, renderer);
+    button2 = new Button(2, 300, 300, 100, 100, "Test2", textColor, filePath, renderer);
 
     /*
         if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
@@ -130,8 +135,13 @@ int Window::loopWindow()
                 SDL_GetMouseState(&mouseX, &mouseY);
                 if (button->isClicked(mouseX, mouseY))
                 {
-                    logger->Info("Button clicked!");
+                    logger->Info("Button 1 clicked!");
                 }
+                if (button2->isClicked(mouseX, mouseY))
+                {
+                    logger->Info("Button 2 clicked!");
+                }
+
             }
         }
 
@@ -139,6 +149,7 @@ int Window::loopWindow()
         SDL_RenderClear(renderer);
 
         button->render(renderer, w_font);
+        button2->render(renderer, w_font);
         
         // Render text to screen
         renderText(renderer, "I love latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
@@ -182,8 +193,9 @@ int Window::destroyWindow()
     }
 
     if (button != nullptr) {
-        logger->Info("Destroying Button");
+        logger->Info("Destroying Buttons");
         delete button;
+        delete button2;
     }
 
     //IMG_Quit();

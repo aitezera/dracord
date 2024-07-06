@@ -12,15 +12,15 @@ class Button {
     public:
         int unique_id;
         int x, y, w, h;
-        string text;
+        string text, filePath;
         SDL_Texture *texture;
 
         SDL_Color buttonColour = {255, 0, 0, 255};
         SDL_Color textColour = {0, 0, 0, 255};
 
-        Button(int id, int posX, int posY, int width, int height, string text, SDL_Renderer *renderer);
         Button(int id, int posX, int posY, int width, int height, string text, SDL_Color textColour, SDL_Renderer *renderer);
-
+        Button(int id, int posX, int posY, int width, int height, string text, SDL_Color textColour, string filePath, SDL_Renderer *renderer);
+        
         ~Button();
 
         void render(SDL_Renderer *renderer, TTF_Font *font);

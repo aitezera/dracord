@@ -1,5 +1,5 @@
 #include "button.h"
-
+#include "logging.h"
 
 Button::Button(int id, int posX, int posY, int width, int height, string text, SDL_Color textColour, SDL_Renderer *renderer) {
     this->unique_id = id;
@@ -9,25 +9,38 @@ Button::Button(int id, int posX, int posY, int width, int height, string text, S
     this->h = height;
     this->text = text;
     this->textColour = textColour;
+}
 
-    SDL_Surface *surface = IMG_Load("images/test.jpg");
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
+Button::Button(int id, int posX, int posY, int width, int height, string text, SDL_Color textColour, string filePath, SDL_Renderer *renderer) {
+    this->unique_id = id;
+    this->x = posX;
+    this->y = posY;
+    this->w = width;
+    this->h = height;
+    this->text = text;
+    this->textColour = textColour;
+    
+    SDL_Surface *surface = IMG_Load(filePath.c_str());
+    this->texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
 
     if (texture == nullptr) {
         throw std::runtime_error("Failed to create texture");
-    }    
+    }
 }
-
 
 Button::~Button() {
     SDL_DestroyTexture(texture);
 }
 
-
 void Button::render(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_Rect rect = {x, y, w, h};
-    SDL_RenderCopy(renderer, texture, nullptr, &rect);
+    if (texture == nullptr) {
+        SDL_SetRenderDrawColor(renderer, buttonColour.r, buttonColour.g, buttonColour.b, buttonColour.a);
+        SDL_RenderFillRect(renderer, &rect);
+    } else {
+        SDL_RenderCopy(renderer, texture, nullptr, &rect);
+    }
 
     // Render text in the middle of the button
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, text.c_str(), textColour);
