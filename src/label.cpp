@@ -5,7 +5,15 @@ Label::Label(std::string text, int x, int y, SDL_Color color) {
     this->text = text;
     this->x = x;
     this->y = y;
-    this->font = loadFont(getFontPath("Roboto-Regular.ttf").c_str());
+    this->font = loadFont(getFontPath("Roboto-Regular.ttf").c_str()); // Will automatically assume the font is in the assets/fonts directory | Need to see if universal fonts work
+    this->color = color;
+}
+
+Label::Label(std::string text, int x, int y, SDL_Color color, std::string fontPath) {
+    this->text = text;
+    this->x = x;
+    this->y = y;
+    this->font = loadFont(getFontPath(fontPath).c_str());
     this->color = color;
 }
 
@@ -20,6 +28,7 @@ TTF_Font* Label::getFont() {
 TTF_Font* Label::loadFont(const char* file) {
     if (TTF_Init() == -1) {
         logger->Error(("Failed to initialize TTF: " + std::string(TTF_GetError())).c_str());
+        return nullptr;
     }
 
     logger->Info("Initialized TTF Font Library");

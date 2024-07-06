@@ -164,7 +164,7 @@ int Window::destroyWindow()
     }
 
     if (label != nullptr) {
-        logger->Info("Destroying TTF Font Library");
+        logger->Info("Destroying Label");
         delete label;
     }
 

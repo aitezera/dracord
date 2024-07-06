@@ -18,6 +18,7 @@ class Label {
         SDL_Color color;
 
         Label(string text, int x, int y, SDL_Color color);
+        Label(string text, int x, int y, SDL_Color color, string fontPath);
         ~Label();
 
         void render(SDL_Renderer* renderer);
