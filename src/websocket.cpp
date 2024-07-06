@@ -17,16 +17,22 @@ void WebSocket::handleEvents(const Json::Value& event) {
 
     if (type == "MESSAGE_CREATE") {
         logger->Info(("User: " + event["d"]["author"]["username"].asString() + " created message: " + event["d"]["content"].asString()).c_str());
+
     } else if (type == "TYPING_START") {
         logger->Info(("User is typing: " + event["d"]["user_id"].asString() + " in channel: " + event["d"]["channel_id"].asString()).c_str());
+        
     } else if (type == "MESSAGE_DELETE") {
         logger->Info(("Message deleted: " + event["d"]["id"].asString() + " in channel: " + event["d"]["name"].asString()).c_str());
+
     } else if (type == "PRESENCE_UPDATE") {
         logger->Info(("Presence updated: " + event["d"]["user"]["id"].asString() + " to: " + event["d"]["status"].asString()).c_str());
+
     } else if (type == "USER_SETTINGS_UPDATE") {
         logger->Info(("User:" + event["d"]["display_name"].asString() + " changed: " + event["d"]["key"].asString() + "to: " + event["d"]["value"].asString()).c_str());
+
     } else if (type == "MESSAGE_UPDATE") {
         logger->Info(("Message updated: " + event["d"]["content"].asString() + " in channel: " + event["d"]["channel_id"].asString()).c_str());
+        
     }
 }
 
@@ -54,7 +60,8 @@ void WebSocket::connectToGateway(const Requests& req) {
             Json::Value identify;
             identify["op"] = 2;
 
-            // TODO: Figure some other way to get token from requests
+            // TODO: Figure some other way to get token from requests | If needed or is concern
+            // TODO: Refresh the token if it's expired ~ Limited to 1000 indentifies per day
 
             identify["d"]["token"] = req.r_token;
             identify["d"]["intents"] = DISCORD_ALL_INTENTS;

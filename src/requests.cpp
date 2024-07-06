@@ -48,13 +48,8 @@ int Requests::loginUser() {
     logger->Info("Loading Guilds from the Discord API");
     loadGuilds();
 
-    // Fix Channels only loading DMs and not Guilds
-    // Bundle DMs with Friends and Guilds with Channels
-    logger->Info("Loading Channels from the Discord API");
-    loadChannels();
-
     logger->Info("Loading Message history from the Discord API");
-    //loadMessages();
+    loadMessages();
     
     WebSocket* ws = new WebSocket;
     ws->connectToGateway(*this);
@@ -252,6 +247,7 @@ void Requests::loadGuilds() {
         } else {
             if (guildObj.isMember("id")) {
                 writeCache("guilds", guildObj["id"].asString(), guildObj);
+                loadChannels(guildObj["id"].asString());
             } else {
                 logger->Error(("Failed to retrieve ID from JSON object: " + guildObj.toStyledString()).c_str());
             }
@@ -262,8 +258,12 @@ void Requests::loadGuilds() {
 //
 //_____________________________________________________________________________________________________________________________
 
-void Requests::loadChannels() {
-    cpr::Response response = cpr::Get(cpr::Url{r_api + "users/@me/channels"}, r_headers=r_headers);
+
+// When I move to SDL2 remove the loop on loading channels
+// Instead, load channels upon clicking on a guild.
+// This will save API requests and probably save getting rate limited.
+void Requests::loadChannels(string guildID) {
+    cpr::Response response = cpr::Get(cpr::Url{r_api + "guilds/" + guildID + "/channels"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
 
     if (response.status_code != 200) {
@@ -305,7 +305,26 @@ void Requests::loadMessages() {
         return;
     }
     
-    logger->Info(("Response: " + std::string(response.text)).c_str());
+    Json::Value json;
+    json = parseToJson(response.text);
+
+    if (!json.isArray()) {
+        logger->Error("Failed to parse JSON to Array");
+        return;
+    }
+
+    for (const auto& messageObj : json) {
+        if (std::ifstream("cache/messages/" + messageObj["id"].asString() + ".json").good()) {
+            //logger->Info(("Message already exists in cache: " + messageObj["id"].asString()).c_str());
+            continue;
+        } else {
+            if (messageObj.isMember("id")) {
+                writeCache("messages", messageObj["id"].asString(), messageObj);
+            } else {
+                logger->Error(("Failed to retrieve ID from JSON object: " + messageObj.toStyledString()).c_str());
+                }
+            }
+        }
 }
 
 //
@@ -412,9 +431,7 @@ void Friend::send_message(long channel_id, std::string message) {
 
 int main() {
     std::string token;
-
     Requests requests(token);
     requests.loginUser();
-
     return 0;
 }

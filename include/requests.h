@@ -47,7 +47,7 @@ class Requests {
         
         void loadFriends();
         void loadGuilds();
-        void loadChannels();
+        void loadChannels(std::string guildID);
         void loadMessages();
         void handleStatusCode(int r_status_code, string r_error);
 
