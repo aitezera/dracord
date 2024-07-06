@@ -64,11 +64,8 @@ int Window::createWindow(const char* windowName)
         return 1;
     }
     
-    SDL_Color textColor = { 0, 255, 0, 255 };
-    std::string filePath = "images/test.jpg";
-
-    button = new Button(1, 100, 100, 100, 100, "Test", textColor, renderer);
-    button2 = new Button(2, 300, 300, 100, 100, "Test2", textColor, filePath, renderer);
+    button = new Button(1, 100, 100, 100, 100, "Test", { 0, 255, 0, 255 }, renderer);
+    button2 = new Button(2, 300, 300, 100, 100, "Test2", { 0, 0, 255, 255 }, "images/test.jpg", renderer);
 
     /*
         if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
