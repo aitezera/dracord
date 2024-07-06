@@ -48,7 +48,7 @@ void Label::render(SDL_Renderer* renderer) {
     SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
 
     if (!surface) {
-        logger->Error(("Failed to render text: " + std::string(TTF_GetError())).c_str());
+        logger->Error(("Failed to render text for label: " + std::string(TTF_GetError())).c_str());
         return;
     }
 

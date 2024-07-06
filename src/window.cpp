@@ -1,11 +1,14 @@
 #include "window.h"
 #include "logging.h"
+
 #include "button.h"
 #include "label.h"
+#include "textfield.h"
 
 Label* label;
 Button* button;
 Button* button2;
+TextField* textfield;
 
 int Window::createWindow(const char* windowName)
 {
@@ -45,6 +48,8 @@ int Window::createWindow(const char* windowName)
     logger->Info("Renderer created successfully!");
 
     label = new Label("I love latinas", 10, 10, { 255, 255, 255, 255 });
+    textfield = new TextField(10, 50, 200, 50, renderer);
+
     button = new Button(1, 100, 100, 100, 100, "Test", { 0, 255, 0, 255 }, renderer);
     button2 = new Button(2, 300, 300, 100, 100, "Test2", { 0, 0, 255, 255 }, "images/test.jpg", renderer);
 
@@ -107,6 +112,11 @@ int Window::loopWindow()
                 running = false;
             }
 
+            // This wont work, fix later
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_ENTER) {
+                logger->Info(textfield->getText().c_str());
+            }
+            
             if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
             {
                 int mouseX, mouseY;
@@ -120,6 +130,7 @@ int Window::loopWindow()
                     logger->Info("Button 2 clicked!");
                 }
             }
+            textfield->handleTyping(&event);
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -127,6 +138,7 @@ int Window::loopWindow()
 
         button->render(renderer, label->getFont());
         button2->render(renderer, label->getFont());
+        textfield->render(renderer, label->getFont());
         
         // Render text to screen
         label->render(renderer);
@@ -166,6 +178,11 @@ int Window::destroyWindow()
     if (label != nullptr) {
         logger->Info("Destroying Label");
         delete label;
+    }
+
+    if (textfield != nullptr) {
+        logger->Info("Destroying TextField");
+        delete textfield;
     }
 
     if (button != nullptr) {
