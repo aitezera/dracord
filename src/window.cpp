@@ -140,6 +140,7 @@ int Window::loopWindow()
                 if (button->isClicked(mouseX, mouseY))
                 {
                     logger->Info("Button 1 clicked!");
+                    logger->Info(textfield->getText().c_str());
                 }
                 if (button2->isClicked(mouseX, mouseY))
                 {
@@ -152,8 +153,8 @@ int Window::loopWindow()
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        //button->render(renderer, label->getFont());
-        //button2->render(renderer, label->getFont());
+        button->render(renderer);
+        button2->render(renderer);
         textfield->render(renderer);
         
         // Render text to screen
