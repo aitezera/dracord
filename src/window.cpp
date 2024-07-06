@@ -137,15 +137,12 @@ int Window::loopWindow()
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-        //SDL_RenderCopy(renderer, texture, nullptr, nullptr);
 
         button->render(renderer, w_font);
         
         // Render text to screen
-        //renderText(renderer, "I love latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
-        //SDL_RenderPresent(renderer);
-
-        SDL_RenderPresent(renderer); // Add this line to update the window
+        renderText(renderer, "I love latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
+        SDL_RenderPresent(renderer);
 
         SDL_Delay(10);
     }
@@ -184,10 +181,14 @@ int Window::destroyWindow()
         w_font = nullptr;
     }
 
+    if (button != nullptr) {
+        logger->Info("Destroying Button");
+        delete button;
+    }
+
     //IMG_Quit();
     SDL_Quit();
     TTF_Quit();
-    delete button;
 
     return 0;
 }

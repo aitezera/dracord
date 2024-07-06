@@ -77,7 +77,7 @@ CPMAddPackage(
 # Add the executable target
 add_executable(${PROJECT_NAME} ${CPPFILES})
 
-target_link_libraries(requests
+target_link_libraries(${PROJECT_NAME}
     ZLIB::ZLIB
     PNG::PNG
     SDL2::SDL2
