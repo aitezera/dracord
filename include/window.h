@@ -11,8 +11,8 @@
 
 class Window : UI {
     private:
-        const int WIDTH = 640*2;
-        const int HEIGHT = 480*2;
+        const int WIDTH = 320*2;
+        const int HEIGHT = 240*2;
         bool running = true;
 
     public:

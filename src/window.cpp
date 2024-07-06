@@ -1,5 +1,8 @@
 #include "window.h"
 #include "logging.h"
+#include "button.h"
+
+Button* button;
 
 int Window::createWindow(const char* windowName)
 {
@@ -60,6 +63,8 @@ int Window::createWindow(const char* windowName)
         return 1;
     }
 
+    button = new Button(1, 100, 100, 100, 100, "Test", {0, 255, 0, 255}, renderer);
+
     /*
         if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
         {
@@ -86,6 +91,7 @@ int Window::createWindow(const char* windowName)
         logger->Info("Image loaded successfully!");
 
         texture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+    
         if (texture == nullptr)
         {
             logger->Error(("Unable to create texture! Error: " + std::string(SDL_GetError())).c_str());
@@ -114,33 +120,33 @@ int Window::loopWindow()
     {
         while (SDL_PollEvent(&event))
         {
-            if (event.type == SDL_QUIT)
+            if (event.type == SDL_QUIT) {
                 running = false;
+            }
+
+            if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
+            {
+                int mouseX, mouseY;
+                SDL_GetMouseState(&mouseX, &mouseY);
+                if (button->isClicked(mouseX, mouseY))
+                {
+                    logger->Info("Button clicked!");
+                }
+            }
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         //SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+
+        button->render(renderer, w_font);
         
-        // Create sidebar for guilds to go within
-        SDL_SetRenderDrawColor(renderer, c_sidebar.r, c_sidebar.g, c_sidebar.b, c_sidebar.a);
-        SDL_RenderFillRect(renderer, &sidebar);
-
-        // Create sidebar for friends to go within
-        SDL_SetRenderDrawColor(renderer, c_friend_sidebar.r, c_friend_sidebar.g, c_friend_sidebar.b, c_friend_sidebar.a);
-        SDL_RenderFillRect(renderer, &friend_sidebar);
-
-        // Create topbar for the server
-        SDL_SetRenderDrawColor(renderer, c_mainCol.r, c_mainCol.g, c_mainCol.b, c_mainCol.a);
-        SDL_RenderFillRect(renderer, &topbar);
-
-        // Create chat window
-        SDL_SetRenderDrawColor(renderer, c_mainCol.r, c_mainCol.g, c_mainCol.b, c_mainCol.a);
-        SDL_RenderFillRect(renderer, &chat_window);
-
         // Render text to screen
-        renderText(renderer, "I love latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
-        SDL_RenderPresent(renderer);
+        //renderText(renderer, "I love latinas", { 255, 255, 255, 255 }, 10, 10, w_font);
+        //SDL_RenderPresent(renderer);
+
+        SDL_RenderPresent(renderer); // Add this line to update the window
+
         SDL_Delay(10);
     }
 
@@ -181,6 +187,7 @@ int Window::destroyWindow()
     //IMG_Quit();
     SDL_Quit();
     TTF_Quit();
+    delete button;
 
     return 0;
 }

@@ -19,63 +19,84 @@ file(GLOB_RECURSE HPPFILES "${INCLUDE_DIR}/*.hpp")
 # Add include directories
 include_directories(${INCLUDE_DIR})
 
-# Add CPM to download any missing dependencies
 include(cmake/CPM.cmake)
 
-# Find required packages
-CPMAddPackage(
-  NAME SDL2pp
-  GITHUB_REPOSITORY libSDL2pp/libSDL2pp
-  GIT_TAG origin/master
-)
-
-CPMAddPackage(
-  NAME jsoncpp
-  GITHUB_REPOSITORY open-source-parsers/jsoncpp
-  GIT_TAG 1.9.5
-)
-
-CPMAddPackage(
-  NAME cpr
-  GITHUB_REPOSITORY libcpr/cpr
-  GIT_TAG 1.8.1
-)
-
-#CPMAddPackage(
-#  NAME IXWebSocket
-#  GITHUB_REPOSITORY machinezone/IXWebSocket
-#  GIT_TAG origin/master
-#)
-
+# PNG and ZLIB seem to be broken using CPM
 find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
-find_package(ixwebsocket REQUIRED)
 
-# PNG and ZLIB seem to be broken using CPM
-# Will have to mantually find and link them
+#CPMAddPackage(
+#    NAME ZLIB
+#    GITHUB_REPOSITORY madler/zlib
+#    GIT_TAG v1.3.1
+#)
+
+#CPMAddPackage(
+#    NAME PNG
+#    GITHUB_REPOSITORY glennrp/libpng
+#    GIT_TAG v1.6.43
+#)
+
+CPMAddPackage(
+    NAME SDL2
+    GITHUB_REPOSITORY libsdl-org/SDL
+    GIT_TAG release-2.30.5
+)
+
+CPMAddPackage(
+    NAME SDL2_IMAGE
+    GITHUB_REPOSITORY libsdl-org/SDL_image
+    GIT_TAG release-2.8.2
+)
+
+CPMAddPackage(
+    NAME SDL2_TTF
+    GITHUB_REPOSITORY libsdl-org/SDL_ttf
+    GIT_TAG release-2.22.0
+)
+
+CPMAddPackage(
+    NAME jsoncpp
+    GITHUB_REPOSITORY open-source-parsers/jsoncpp
+    GIT_TAG 1.9.5
+)
+
+CPMAddPackage(
+    NAME cpr
+    GITHUB_REPOSITORY libcpr/cpr
+    GIT_TAG 1.10.5
+
+)
+
+CPMAddPackage(
+    NAME ixwebsocket
+    GITHUB_REPOSITORY machinezone/IXWebSocket
+    GIT_TAG v11.4.5
+)
 
 # Add the executable target
 add_executable(${PROJECT_NAME} ${CPPFILES})
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(requests
     ZLIB::ZLIB
     PNG::PNG
-    ${SDL2PP_LIBRARIES}
+    SDL2::SDL2
+    SDL2_ttf::SDL2_ttf
+    SDL2_image::SDL2_image
     jsoncpp_lib
     cpr::cpr
     ixwebsocket::ixwebsocket
 )
 
 # Custom target for client
-add_executable(client ${SRC_DIR}/main.cpp ${SRC_DIR}/window.cpp ${SRC_DIR}/ui.cpp ${SRC_DIR}/logging.cpp)
+add_executable(client ${SRC_DIR}/main.cpp ${SRC_DIR}/window.cpp ${SRC_DIR}/ui.cpp ${SRC_DIR}/logging.cpp ${SRC_DIR}/button.cpp)
 
 target_link_libraries(client
     ZLIB::ZLIB
     PNG::PNG
-    ${SDL2PP_LIBRARIES}
-    jsoncpp_lib
-    cpr::cpr
-    ixwebsocket::ixwebsocket
+    SDL2::SDL2
+    SDL2_ttf::SDL2_ttf
+    SDL2_image::SDL2_image
 )
 
 # Custom target for requests
@@ -84,7 +105,9 @@ add_executable(requests ${SRC_DIR}/requests.cpp ${SRC_DIR}/websocket.cpp ${SRC_D
 target_link_libraries(requests
     ZLIB::ZLIB
     PNG::PNG
-    ${SDL2PP_LIBRARIES}
+    SDL2::SDL2
+    SDL2_ttf::SDL2_ttf
+    SDL2_image::SDL2_image
     jsoncpp_lib
     cpr::cpr
     ixwebsocket::ixwebsocket

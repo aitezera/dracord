@@ -296,6 +296,8 @@ void Requests::loadChannels(string guildID) {
 //
 //_____________________________________________________________________________________________________________________________
 
+// Only retrieves DMs that are open at the time.
+// Find another way to retrieve all DMs
 void Requests::loadMessages() {    
     cpr::Response response = cpr::Get(cpr::Url{r_api + "users/@me/channels"}, r_headers=r_headers);
     logger->Info(("Using GET response with URL: " + std::string(response.url)).c_str());
