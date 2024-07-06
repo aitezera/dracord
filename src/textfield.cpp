@@ -31,7 +31,9 @@ void TextField::handleTyping(SDL_Event* event) {
             text += event->text.text;
         }
     }
-    if (active && event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_BACKSPACE && text.length() > 0) {
+    // > 1 because there's a space at the start 
+    // This is to remove the "Text has zero width error" that spams the console
+    if (active && event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_BACKSPACE && text.length() > 1) {
         text.pop_back();
     }
 }
