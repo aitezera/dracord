@@ -25,4 +25,6 @@ class Label {
         TTF_Font* getFont();
         TTF_Font* loadFont(const char* file);
         std::string getFontPath(const std::string& fontName);
+
+        void changeText(string newText);
 };

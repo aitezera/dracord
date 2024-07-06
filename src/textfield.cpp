@@ -137,7 +137,7 @@ TTF_Font* TextField::loadFont(const char* file) {
         return nullptr;
     }
 
-    logger->Info(("Loaded font successfully from file: " + std::string(file)).c_str());
+    logger->Info("Loaded font successfully for TextField");
     return font;
 }
 

@@ -14,6 +14,7 @@ Button* button;
 Button* button2;
 TextField* textfield;
 
+
 //
 //_____________________________________________________________________________________________________________________________
 
@@ -59,53 +60,11 @@ int Window::createWindow(const char* windowName)
     label = new Label("This is a label", 10, 10, { 255, 255, 255, 255 });
 
     logger->Info("Initalising TextField");
-    textfield = new TextField(10, 50, 200, 20, 30, renderer);
+    textfield = new TextField(170, 350, 200, 50, 50, renderer);
     
     logger->Info("Initalising Buttons");
-    button = new Button(1, 100, 100, 100, 100, "Test", { 0, 255, 0, 255 }, renderer);
-    button2 = new Button(2, 100, 300, 100, 100, "Test2", { 0, 0, 255, 255 }, "images/test.jpg", renderer);
-
-    /*
-        if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
-        {
-            logger->Error(("SDL_Image could not be initialized! Error: " + std::string(IMG_GetError())).c_str());
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            SDL_Quit();
-            return 1;
-        }
-
-        logger->Info("SDL_Image initialized successfully!");
-
-        loadedSurface = IMG_Load("/media/Software/Code/C++/dracord/images/test.jpg");
-        if (loadedSurface == nullptr)
-        {
-            logger->Error(("Unable to load image! Error: " + std::string(IMG_GetError())).c_str());
-            IMG_Quit();
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            SDL_Quit();
-            return 1;
-        }
-
-        logger->Info("Image loaded successfully!");
-
-        texture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-    
-        if (texture == nullptr)
-        {
-            logger->Error(("Unable to create texture! Error: " + std::string(SDL_GetError())).c_str());
-            SDL_FreeSurface(loadedSurface);
-            IMG_Quit();
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            SDL_Quit();
-            return 1;
-        }
-  
-    logger->Info("Texture created successfully!");
-    SDL_FreeSurface(loadedSurface);
-    */
+    button = new Button(1, 100, 100, 150, 100, "Change Text", { 0, 255, 0, 255 }, renderer);
+    button2 = new Button(2, 300, 100, 150, 100, "Reverse Text", { 0, 0, 255, 255 }, "images/test.jpg", renderer);
 
     loopWindow();
 
@@ -139,12 +98,12 @@ int Window::loopWindow()
                 SDL_GetMouseState(&mouseX, &mouseY);
                 if (button->isClicked(mouseX, mouseY))
                 {
-                    logger->Info("Button 1 clicked!");
-                    logger->Info(textfield->getText().c_str());
+                    logger->Info(("Text:" + textfield->getText()).c_str());
+                    label->changeText(textfield->getText());
                 }
                 if (button2->isClicked(mouseX, mouseY))
                 {
-                    logger->Info("Button 2 clicked!");
+                    label->changeText("This is a label");
                 }
             }
             textfield->handleTyping(&event);
@@ -158,7 +117,7 @@ int Window::loopWindow()
         textfield->render(renderer);
         
         // Render text to screen
-        //label->render(renderer);
+        label->render(renderer);
         SDL_RenderPresent(renderer);
 
         SDL_Delay(10);
@@ -177,12 +136,6 @@ int Window::loopWindow()
 int Window::destroyWindow()
 {
     logger->Info("Destroying Window Components");
-
-    //if (texture != nullptr) {
-    //    logger->Info("Destroying texture");
-    //    SDL_DestroyTexture(texture);
-    //    texture = nullptr;
-    //}
 
     if (renderer != nullptr) {
         logger->Info("Destroying Renderer");
@@ -212,7 +165,6 @@ int Window::destroyWindow()
         delete button2;
     }
 
-    //IMG_Quit();
     SDL_Quit();
     TTF_Quit();
 

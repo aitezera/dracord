@@ -59,7 +59,7 @@ TTF_Font* Label::loadFont(const char* file) {
         return nullptr;
     }
 
-    logger->Info(("Loaded font successfully from file: " + std::string(file)).c_str());
+    logger->Info("Loaded font successfully for Label");
     return font;
 }
 
@@ -122,3 +122,7 @@ std::string Label::getFontPath(const std::string& fontName) {
 
 //
 //_____________________________________________________________________________________________________________________________
+
+void Label::changeText(std::string newText) {
+    this->text = newText;
+}
